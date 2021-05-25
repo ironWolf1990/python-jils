@@ -93,7 +93,7 @@ class JGraphicSocket(QGraphicsItem):
 
     def ConnectEdge(self, edge: str) -> None:
         assert edge is not None
-        assert not self.AtMaxLimit(), logger.warning("max edge limit reached")
+        assert not self.AtMaxLimit(), logger.error("max edge limit reached")
         self._edgeList.add(edge)
 
     def DisconnectEdge(self, edge: str):

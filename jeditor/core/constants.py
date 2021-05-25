@@ -1,10 +1,12 @@
 class JCONSTANTS:
     class EDITOR:
         WIDTH: int = 1280
-        HEIGHT: int = 720
+        HEIGHT: int = 900
         TITLE: str = "J-Editor"
         SPLASH: bool = True
         SPLASH_IMAGE: str = r"resources/splash.png"
+        SPLASH_TIME: int = 2000
+        START_CENTER_ON_MOUSE = False
 
     class GRSCENE:
         BACKGROUND_COLOR: str = "#393939"

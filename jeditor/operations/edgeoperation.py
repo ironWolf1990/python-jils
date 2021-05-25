@@ -1,6 +1,6 @@
 from jeditor.core.constants import JCONSTANTS
 from jeditor.core.graphicedge import JGraphicEdge
-from PyQt5.QtCore import QPointF
+from PyQt5.QtCore import QObject, QPointF
 from jeditor.core.graphicsocket import JGraphicSocket
 import logging
 from typing import Optional, Tuple
@@ -11,7 +11,7 @@ from jeditor.logger import logger
 logger = logging.getLogger(__name__)
 
 
-class JEdgeDragging:
+class JEdgeDragging(QObject):
     def __init__(self, graphicsScene: QtWidgets.QGraphicsScene):
         self._graphicsScene = graphicsScene
         self._startSocket: Optional[JGraphicSocket] = None
@@ -148,13 +148,14 @@ class JEdgeDragging:
 
     def Reset(self):
         assert isinstance(self._tempEdge, JGraphicEdge)
+        self._tempEdge.update()
         self._startSocket = None
         self._destinationSocket = None
         self._dragPosition = QPointF()
         self._tempEdge = None
 
 
-class JEdgeRerouting:
+class JEdgeRerouting(QObject):
     def __init__(self, graphicsScene: QtWidgets.QGraphicsScene):
         self._graphicsScene = graphicsScene
 
@@ -171,6 +172,7 @@ class JEdgeRerouting:
             "re-routing a new edge while previous edge re-routing is not finished / not reset to none"
         )
 
+        logger.debug(f"re-routing edge {edge.edgeId}")
         self._tempEdge = edge
         self._startSocket = edge.startSocket
         self._oDestinationSocket = edge.destinationSocket
@@ -211,8 +213,29 @@ class JEdgeRerouting:
                 logger.warning(f"socket belong to same parent")
                 flag = False
 
-            # * duplicate edge
+            # * reconnecting to same destination socket
             elif self._oDestinationSocket.socketId == destinationSocket.socketId:
+                logger.warning(f"reconnecting to same destination socket")
+                flag = False
+
+            # * checking for duplicate edge
+            elif (
+                len(
+                    list(
+                        filter(
+                            lambda edge: isinstance(edge, JGraphicEdge)
+                            and isinstance(destinationSocket, JGraphicSocket)
+                            and edge.edgeId != self._tempEdge.edgeId
+                            and edge.startSocket.socketId
+                            == self._tempEdge.startSocket.socketId
+                            and edge.destinationSocket.socketId
+                            == destinationSocket.socketId,
+                            self._graphicsScene.items(),
+                        )
+                    )
+                )
+                >= 1
+            ):
                 logger.warning(f"duplicate edge")
                 flag = False
 
@@ -251,6 +274,7 @@ class JEdgeRerouting:
 
     def Reset(self):
         assert isinstance(self._tempEdge, JGraphicEdge)
+        self._tempEdge.update()
         self._startSocket = None
         self._oDestinationSocket = None
         self._nDestinationSocket = None

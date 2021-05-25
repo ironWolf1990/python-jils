@@ -203,7 +203,6 @@ class JGraphicNode(QGraphicsItem):
             self._graphicsNodeContent.setWidget(nodeContent)
 
     def Serialize(self) -> OrderedDict:
-
         node = OrderedDict(
             {
                 "nodeId": self._nodeId,

@@ -16,6 +16,12 @@ class JGraphicScene(QtWidgets.QGraphicsScene):
         self._penMajorLine.setWidth(self._widhtMajorLine)
         self._penMinorLine.setWidth(self._widhtMinorLine)
 
+        self.setSceneRect(
+            -JCONSTANTS.GRSCENE.WIDTH // 2,
+            -JCONSTANTS.GRSCENE.HEIGHT // 2,
+            JCONSTANTS.GRSCENE.WIDTH,
+            JCONSTANTS.GRSCENE.HEIGHT,
+        )
         self.setBackgroundBrush(self._colorBackground)
 
     def SetWidthHeight(self, width, height):

@@ -1,3 +1,4 @@
+from jeditor.core.graphicview import JGraphicView
 import logging
 from functools import partial
 from typing import Callable, Optional
@@ -63,8 +64,8 @@ class JMenuBar(QtWidgets.QMenuBar):
                 self,
                 "&Open",
                 "Ctrl+O",
-                "open new graph model",
-                partial(Load, self._editorWidget.sceneManager),
+                "open graph model",
+                partial(Open, self._editorWidget.sceneManager),
             )
         )
         fileMenu.addSeparator()
@@ -212,16 +213,16 @@ class JMenuBar(QtWidgets.QMenuBar):
                 "&Copy",
                 "Ctrl+C",
                 "create new graph model",
-                partial(Copy, self._editorWidget.sceneManager),
+                partial(Copy, self._editorWidget.graphicView),
             )
         )
         editMenu.addAction(
             CreateAction(
                 self,
                 "&Paste",
-                "Ctrl+P",
+                "Ctrl+V",
                 "create new graph model",
-                partial(Paste, self._editorWidget.sceneManager),
+                partial(Paste, self._editorWidget.graphicView),
             )
         )
         editMenu.addSeparator()
@@ -238,7 +239,7 @@ class JMenuBar(QtWidgets.QMenuBar):
             CreateAction(
                 self,
                 "&Search",
-                "Ctrl+S",
+                None,
                 "create new graph model",
                 partial(Search, self._editorWidget.sceneManager),
             )
@@ -315,9 +316,9 @@ def New(sceneManager: JSceneManager):
     logger.debug("new")
 
 
-def Load(sceneManager: JSceneManager):
+def Open(sceneManager: JSceneManager):
     logger.debug("load")
-    sceneManager.Deserialize(sceneManager.LoadFromFile())
+    sceneManager.LoadFromFile()
 
 
 def Close(sceneManager: JSceneManager):
@@ -364,12 +365,14 @@ def Cut(sceneManager: JSceneManager):
     logger.debug("cut")
 
 
-def Copy(sceneManager: JSceneManager):
+def Copy(graphicsView: JGraphicView):
     logger.debug("copy")
+    graphicsView.CopyGraphicsItems()
 
 
-def Paste(sceneManager: JSceneManager):
+def Paste(graphicsView: JGraphicView):
     logger.debug("paste")
+    graphicsView.PasteGraphicsItems()
 
 
 def Find(sceneManager: JSceneManager):

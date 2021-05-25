@@ -2,7 +2,7 @@ from jeditor.core.constants import JCONSTANTS
 from jeditor.stylesheet import STYLE_SPLASH
 import typing
 from PyQt5 import QtCore
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QSize, QTimer
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (
     QDialog,
@@ -24,7 +24,8 @@ class StartUp(QDialog):
         super().__init__(parent=parent, flags=flags)
 
         self.setWindowTitle("J-Editor Spash Screen")
-        self.setGeometry(parent.geometry())
+        # self.setGeometry(parent.geometry())
+        self.resize(QSize(640, 360))
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
         self.setStyleSheet(STYLE_SPLASH)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
@@ -51,7 +52,7 @@ class StartUp(QDialog):
         self.layout().addWidget(splash)
 
         self.timer = QTimer()
-        self.timer.singleShot(3000, self.Close)
+        self.timer.singleShot(JCONSTANTS.EDITOR.SPLASH_TIME, self.Close)
 
     def Close(self):
         self.finish.emit(True)  # type:ignore

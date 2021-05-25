@@ -5,7 +5,7 @@ from jeditor.core.constants import JCONSTANTS
 from jeditor.core.editorwidget import JEditorWidget
 import typing
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QStatusBar, QWidget
+from PyQt5.QtWidgets import QDesktopWidget, QMainWindow, QStatusBar, QWidget
 
 
 class JStatusBar(QStatusBar):
@@ -28,6 +28,8 @@ class JEditorWindow(QMainWindow):
     def initUI(self):
 
         self.setGeometry(200, 200, JCONSTANTS.EDITOR.WIDTH, JCONSTANTS.EDITOR.HEIGHT)
+        self.Center()
+
         self.setWindowTitle(JCONSTANTS.EDITOR.TITLE)
         self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint)
         self.setWindowFlag(QtCore.Qt.WindowMinimizeButtonHint)
@@ -39,6 +41,25 @@ class JEditorWindow(QMainWindow):
         self.setCentralWidget(self._editorWidget)
 
         self.statusBar().showMessage("this is message")
+
+    def Center(self):
+
+        frame = self.frameGeometry()
+
+        if JCONSTANTS.EDITOR.START_CENTER_ON_MOUSE:
+            frame.moveCenter(
+                QtWidgets.QApplication.desktop()
+                .screenGeometry(
+                    QtWidgets.QApplication.desktop().screenNumber(
+                        QtWidgets.QApplication.desktop().cursor().pos()
+                    )
+                )
+                .center()
+            )
+        else:
+            frame.moveCenter(QDesktopWidget().availableGeometry().center())
+
+        self.move(frame.topLeft())
 
     def show(self) -> None:
         if JCONSTANTS.EDITOR.SPLASH:

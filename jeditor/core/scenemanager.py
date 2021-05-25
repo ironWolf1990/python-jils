@@ -1,25 +1,30 @@
-from jeditor.core.edgemanager import JEdgeDragging, JEdgeRerouting
-from jeditor.core.commands import (
-    EdgeAddCommand,
-    EdgeRemoveCommand,
-    EdgeRerouteCommand,
-    NodeRemoveCommand,
-)
+from jeditor.operations.fileoperation import JFileManager
 import json
 import logging
-from typing import Dict, List, Optional, Tuple
 import typing
+from typing import Dict, List, Optional, Tuple
 
 from jeditor.logger import logger
+from jeditor.operations.clipboardoperation import JClipboard
+from jeditor.operations.datastreamer import JDataStreamer
+from jeditor.operations.edgeoperation import JEdgeDragging, JEdgeRerouting
+from jeditor.operations.nodefactory import JNodeFactory
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QPointF
 from PyQt5.QtWidgets import QUndoStack
+
+from .commands import (
+    JEdgeAddCommand,
+    JEdgeRemoveCommand,
+    JEdgeRerouteCommand,
+    JNodeAddCommand,
+    JNodeRemoveCommand,
+)
 from .constants import JCONSTANTS
 from .graphicedge import JGraphicEdge
 from .graphicnode import JGraphicNode
 from .graphicscene import JGraphicScene
 from .graphicsocket import JGraphicSocket
-from .nodefactory import JNodeFactory
 
 logger = logging.getLogger(__name__)
 
@@ -35,9 +40,11 @@ class JSceneManager(QtCore.QObject):
         self._edgeDragging = JEdgeDragging(self._graphicsScene)
         self._edgeReroute = JEdgeRerouting(self._graphicsScene)
 
-        self._graphicsScene.SetWidthHeight(
-            JCONSTANTS.GRSCENE.WIDTH, JCONSTANTS.GRSCENE.HEIGHT
-        )
+        self._dataStreamer = JDataStreamer(self._graphicsScene)
+        self._fileManager = JFileManager()
+        self._clipboard = JClipboard()
+
+        self._currentFile: Optional[str] = None
 
         self._debug()
 
@@ -63,66 +70,18 @@ class JSceneManager(QtCore.QObject):
         self.graphicsScene.addItem(node2)
         self.graphicsScene.addItem(node3)
 
-    def Serialize(self) -> Dict:
-        logger.info("serializing")
-        node: List[Dict] = []
-        edge: List[Dict] = []
-        for item in self._graphicsScene.items():
-            if isinstance(item, JGraphicNode):
-                node.append(item.Serialize())
-            if isinstance(item, JGraphicEdge):
-                edge.append(item.Serialize())
-        return {"nodes": node, "edges": edge}
+    def SaveToFile(self, fileName="graph.json"):
+        logger.info(f"saving to file")
+        self._fileManager.SaveToFile(self._dataStreamer.Serialize(), fileName=fileName)
 
-    def Deserialize(self, data: Dict):
-        logger.info("deserializing")
-
-        self._graphicsScene.clear()
+    def LoadFromFile(self, fileName="graph.json"):
+        logger.info(f"loading from file")
         self._undoStack.clear()
-
-        for node in data["nodes"]:
-            instanceNode = JGraphicNode.Deserialize(node)
-            self._graphicsScene.addItem(instanceNode)
-
-        for edge in data["edges"]:
-            edgeId = edge["edgeId"]
-            sourceSocketId = edge["sourceSocketId"]
-            desitnationSocketId = edge["desitnationSocketId"]
-
-            sourceSocket: Optional[JGraphicSocket] = None
-            destinationSocket: Optional[JGraphicSocket] = None
-
-            for socket in list(
-                filter(
-                    lambda socket_: isinstance(socket_, JGraphicSocket),
-                    self._graphicsScene.items(),
-                )
-            ):
-                assert isinstance(socket, JGraphicSocket)
-                if socket.socketId == sourceSocketId:
-                    sourceSocket = socket
-                elif socket.socketId == desitnationSocketId:
-                    destinationSocket = socket
-
-            assert sourceSocket, logger.error("source socket not found")
-            assert destinationSocket, logger.error("destination socket not found")
-
-            instanceEdge = JGraphicEdge.Deserialize(
-                edgeId, sourceSocket, destinationSocket
-            )
-
-            self._graphicsScene.addItem(instanceEdge)
-
-    def SaveToFile(self):
-        logger.debug("saving to file")
-        with open("graph.json", "w") as file:
-            json.dump(obj=self.Serialize(), fp=file)
-
-    def LoadFromFile(self) -> Dict:
-        logger.debug("loading from file")
-        with open("graph.json", "r") as file:
-            data = json.load(file)
-            return data
+        self._graphicsScene.clear()
+        for gItem in self._dataStreamer.Deserialize(
+            self._fileManager.LoadFromFile(fileName=fileName)
+        ):
+            self._graphicsScene.addItem(gItem)
 
     def StartEdgeDrag(self, item: QtWidgets.QGraphicsItem) -> bool:
         assert isinstance(item, JGraphicSocket)
@@ -138,7 +97,7 @@ class JSceneManager(QtCore.QObject):
 
             self.undoStack.beginMacro("add edge")
             self.undoStack.push(
-                EdgeAddCommand(graphicScene=self.graphicsScene, edge=edge)
+                JEdgeAddCommand(graphicScene=self.graphicsScene, edge=edge)
             )
             self.undoStack.endMacro()
 
@@ -182,7 +141,7 @@ class JSceneManager(QtCore.QObject):
             logger.debug(f"rerouting edge {edge.edgeId}")
             self.undoStack.beginMacro("rerouting edge")
             self.undoStack.push(
-                EdgeRerouteCommand(
+                JEdgeRerouteCommand(
                     graphicScene=self.graphicsScene,
                     edge=edge,
                     nDestinationSocket=nDestinationSocket,
@@ -207,6 +166,9 @@ class JSceneManager(QtCore.QObject):
                     edgeIdRemove |= set(socket.edgeList)
             elif isinstance(item, JGraphicEdge):
                 edgeIdRemove.add(item.edgeId)
+            elif isinstance(item, JGraphicSocket):
+                # * socket are removed with nodes
+                pass
             else:
                 logger.debug(f"unknown item selected in delete type {type(item)}")
 
@@ -234,9 +196,11 @@ class JSceneManager(QtCore.QObject):
                 self._graphicsScene.items(),
             )
         )
-        assert len(node_) == 1, logger.error(
-            f"error fetching node {nodeId} for removal"
-        )
+        if len(node_) != 1:
+            logger.error(
+                f"error fetching node {nodeId} for removal, not found in scene"
+            )
+            return
 
         node__ = node_[0]
         assert isinstance(node__, JGraphicNode)
@@ -244,7 +208,7 @@ class JSceneManager(QtCore.QObject):
         logger.debug(f"remove node {nodeId}")
         self.undoStack.beginMacro("remove node")
         self.undoStack.push(
-            NodeRemoveCommand(graphicScene=self.graphicsScene, node=node__)
+            JNodeRemoveCommand(graphicScene=self.graphicsScene, node=node__)
         )
         self.undoStack.endMacro()
 
@@ -255,9 +219,11 @@ class JSceneManager(QtCore.QObject):
                 self._graphicsScene.items(),
             )
         )
-        assert len(edge_) == 1, logger.error(
-            f"error fetching node {edgeId} for removal"
-        )
+        if len(edge_) != 1:
+            logger.error(
+                f"error fetching edge {edgeId} for removal, not found in scene"
+            )
+            return
 
         edge__ = edge_[0]
         assert isinstance(edge__, JGraphicEdge)
@@ -265,7 +231,7 @@ class JSceneManager(QtCore.QObject):
         logger.debug(f"remove edge {edgeId}")
         self.undoStack.beginMacro("remove edge")
         self.undoStack.push(
-            EdgeRemoveCommand(graphicScene=self.graphicsScene, edge=edge__)
+            JEdgeRemoveCommand(graphicScene=self.graphicsScene, edge=edge__)
         )
         self.undoStack.endMacro()
 
@@ -281,3 +247,24 @@ class JSceneManager(QtCore.QObject):
         print(f"{10*'-'} SCENE CONNECTIONS")
         ...
         print(f"{30*'='}\n")
+
+    def CopyItems(self):
+        self._clipboard.Copy(self._dataStreamer.Serialize(selected=True))
+
+    def PasteItems(self, mousePosition: QPointF):
+        self._undoStack.beginMacro("pasting items")
+        for gItem in self._dataStreamer.Deserialize(
+            self._clipboard.Paste(mousePosition)
+        ):
+            if isinstance(gItem, JGraphicNode):
+                self._undoStack.beginMacro("pasting node")
+                self._undoStack.push(JNodeAddCommand(self._graphicsScene, gItem))
+                self._undoStack.endMacro()
+
+            if isinstance(gItem, JGraphicEdge):
+                gItem.DisconnectFromSockets()
+                self._undoStack.beginMacro("pasting node")
+                self._undoStack.push(JEdgeAddCommand(self._graphicsScene, gItem))
+                self._undoStack.endMacro()
+
+        self._undoStack.endMacro()

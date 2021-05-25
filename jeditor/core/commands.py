@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QGraphicsScene
 logger = logging.getLogger(__name__)
 
 
-class NodeAddCommand(QtWidgets.QUndoCommand):
+class JNodeAddCommand(QtWidgets.QUndoCommand):
     def __init__(self, graphicScene: QGraphicsScene, node: JGraphicNode) -> None:
         super().__init__()
         self._graphicScene: QGraphicsScene = graphicScene
@@ -26,7 +26,7 @@ class NodeAddCommand(QtWidgets.QUndoCommand):
         self._graphicScene.addItem(self._node)
 
 
-class NodeRemoveCommand(QtWidgets.QUndoCommand):
+class JNodeRemoveCommand(QtWidgets.QUndoCommand):
     def __init__(self, graphicScene: QGraphicsScene, node: JGraphicNode) -> None:
         super().__init__()
         self._graphicScene: QGraphicsScene = graphicScene
@@ -42,7 +42,7 @@ class NodeRemoveCommand(QtWidgets.QUndoCommand):
         self._graphicScene.removeItem(self._node)
 
 
-class NodeMoveCommand(QtWidgets.QUndoCommand):
+class JNodeMoveCommand(QtWidgets.QUndoCommand):
     ...
     # def __init__(self, graphicScene: QGraphicsScene, node: JGraphicNode) -> None:
     #     super().__init__()
@@ -57,7 +57,7 @@ class NodeMoveCommand(QtWidgets.QUndoCommand):
     #     self._graphicScene.removeItem(self._node)
 
 
-class EdgeAddCommand(QtWidgets.QUndoCommand):
+class JEdgeAddCommand(QtWidgets.QUndoCommand):
     def __init__(
         self,
         graphicScene: QGraphicsScene,
@@ -80,7 +80,7 @@ class EdgeAddCommand(QtWidgets.QUndoCommand):
         self._graphicScene.addItem(self._edge)
 
 
-class EdgeRemoveCommand(QtWidgets.QUndoCommand):
+class JEdgeRemoveCommand(QtWidgets.QUndoCommand):
     def __init__(self, graphicScene: QGraphicsScene, edge: JGraphicEdge) -> None:
         super().__init__()
         self._graphicScene: QGraphicsScene = graphicScene
@@ -98,7 +98,7 @@ class EdgeRemoveCommand(QtWidgets.QUndoCommand):
         self._graphicScene.removeItem(self._edge)
 
 
-class EdgeRerouteCommand(QtWidgets.QUndoCommand):
+class JEdgeRerouteCommand(QtWidgets.QUndoCommand):
     def __init__(
         self,
         graphicScene: QGraphicsScene,

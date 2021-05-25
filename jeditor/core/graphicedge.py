@@ -168,12 +168,23 @@ class JGraphicEdge(QGraphicsPathItem):
             [
                 ("edgeId", self._edgeId),
                 ("sourceSocketId", self.startSocket.socketId),
-                ("desitnationSocketId", self.destinationSocket.socketId),
+                ("destinationSocketId", self.destinationSocket.socketId),
             ]
         )
 
     @classmethod
-    def Deserialize(cls, edgeId, startSocket, destinationSocket) -> JGraphicEdge:
+    def Deserialize(
+        cls, edgeId: str, startSocket: JGraphicSocket, destinationSocket: JGraphicSocket
+    ) -> Optional[JGraphicEdge]:
+        edge: Optional[JGraphicEdge] = None
+
+        if startSocket.AtMaxLimit():
+            logger.error("error deserializing edge, start socket at max limit")
+            return None
+        elif destinationSocket.AtMaxLimit():
+            logger.error("error deserializing edge, destination socket at max limit")
+            return None
+
         return JGraphicEdge(
             edgeId=edgeId,
             startSocket=startSocket,
