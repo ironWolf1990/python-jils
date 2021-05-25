@@ -20,7 +20,7 @@ from .commands import (
     JNodeAddCommand,
     JNodeRemoveCommand,
 )
-from .constants import JCONSTANTS
+from jeditor.constants import JCONSTANTS
 from .graphicedge import JGraphicEdge
 from .graphicnode import JGraphicNode
 from .graphicscene import JGraphicScene
@@ -249,13 +249,27 @@ class JSceneManager(QtCore.QObject):
         print(f"{30*'='}\n")
 
     def CopyItems(self):
+        logger.info("copying selected item")
         self._clipboard.Copy(self._dataStreamer.Serialize(selected=True))
 
+    def CutItems(self):
+
+        logger.info("cutting selected item")
+
+        self._clipboard.Cut(self._dataStreamer.Serialize(selected=True))
+        self.RemoveFromScene()
+
     def PasteItems(self, mousePosition: QPointF):
+
+        logger.info("pasting selected item")
+
+        genPaste = self._clipboard.Paste(mousePosition)
+        if not genPaste:
+            logger.warning("no graphic items to paste")
+            return
+
         self._undoStack.beginMacro("pasting items")
-        for gItem in self._dataStreamer.Deserialize(
-            self._clipboard.Paste(mousePosition)
-        ):
+        for gItem in self._dataStreamer.Deserialize(genPaste):
             if isinstance(gItem, JGraphicNode):
                 self._undoStack.beginMacro("pasting node")
                 self._undoStack.push(JNodeAddCommand(self._graphicsScene, gItem))

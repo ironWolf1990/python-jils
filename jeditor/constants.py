@@ -5,7 +5,7 @@ class JCONSTANTS:
         TITLE: str = "J-Editor"
         SPLASH: bool = True
         SPLASH_IMAGE: str = r"resources/splash.png"
-        SPLASH_TIME: int = 2000
+        SPLASH_TIME: int = 1700
         START_CENTER_ON_MOUSE = False
 
     class GRSCENE:
@@ -74,3 +74,7 @@ class JCONSTANTS:
         PATH_SQUARE: int = 2
         PATH_BEZIER: int = 3
         PATH_DRAG: int = 4
+
+    class CLIPBOARD:
+        MODE_COPY: int = 1
+        MODE_CUT: int = 2

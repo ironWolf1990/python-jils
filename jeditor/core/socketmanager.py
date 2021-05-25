@@ -9,7 +9,7 @@ from jeditor.core import graphicnode
 from jeditor.logger import logger
 from PyQt5.QtCore import QPointF
 
-from .constants import JCONSTANTS
+from jeditor.constants import JCONSTANTS
 from .graphicsocket import JGraphicSocket
 
 if TYPE_CHECKING:

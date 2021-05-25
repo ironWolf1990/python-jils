@@ -1,7 +1,7 @@
 from distutils.spawn import spawn
 from jeditor.popup.splashscreen import StartUp
 from jeditor.editormenu import JMenuBar
-from jeditor.core.constants import JCONSTANTS
+from jeditor.constants import JCONSTANTS
 from jeditor.core.editorwidget import JEditorWidget
 import typing
 from PyQt5 import QtCore, QtWidgets

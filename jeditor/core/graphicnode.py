@@ -2,7 +2,7 @@ import logging
 from pprint import pprint
 from .socketmanager import JNodeSocketManager
 from .contentwidget import JNodeContent
-from .constants import JCONSTANTS
+from jeditor.constants import JCONSTANTS
 from typing import Dict, List, Optional, OrderedDict, Tuple
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import (

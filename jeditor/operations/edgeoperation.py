@@ -1,4 +1,4 @@
-from jeditor.core.constants import JCONSTANTS
+from jeditor.constants import JCONSTANTS
 from jeditor.core.graphicedge import JGraphicEdge
 from PyQt5.QtCore import QObject, QPointF
 from jeditor.core.graphicsocket import JGraphicSocket

@@ -1,5 +1,5 @@
 from typing import Optional
-from jeditor.core.constants import JCONSTANTS
+from jeditor.constants import JCONSTANTS
 from jeditor.core.contentwidget import JNodeContent
 from jeditor.core.graphicnode import JGraphicNode
 import uuid

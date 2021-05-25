@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from .constants import JCONSTANTS
+from jeditor.constants import JCONSTANTS
 
 logger = logging.getLogger(__name__)
 

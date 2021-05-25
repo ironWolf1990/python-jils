@@ -90,5 +90,5 @@ results/*.**
 setup.py
 .setup.py
 .mypy_cache
-
+resources/nodez
 this is a test

@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from .constants import JCONSTANTS
+from jeditor.constants import JCONSTANTS
 from .graphicedgepath import JGraphicEdgeBezier, JGraphicEdgeDirect, JGraphicEdgeSquare
 from .graphicsocket import JGraphicSocket
 
@@ -75,12 +75,12 @@ class JGraphicEdge(QGraphicsPathItem):
         self.UpdatePath()
 
     @property
-    def startSocket(self):
-        return self._startSocket
-
-    @property
     def edgeId(self):
         return self._edgeId
+
+    @property
+    def startSocket(self):
+        return self._startSocket
 
     @property
     def destinationSocket(self):

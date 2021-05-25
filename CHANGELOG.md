@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.6.3] - 2021-05-25
+
+### Added
+
+- implement cut copy paste 
+- implement editor window and simple menu boilerplate
+- implement undostack
+- refactor code to call scene action using menu commands 
+- implement splash screen
+- create pydantic base models
+- editor auto centers on startup
+- application can start on primary monitor or on screen with cursor
+
+### Fixed
+
+- edge and socket were not connected properly
+- refactor when pushing commands, redo auto excecutes on push. new graphicsitems and edge disconnections are handled in redo
+- state is mainted when view is panned while edge dragging and rerouting (previous state)
+- during rerouting edge, fix logic for finding duplicate edge and reconnecting to precious edge
+- catching socket max limit during edge deserialization class method. Cause issue when copy pasting items; 
+- edges with sockets that are not copied reconnect to exsisting nodes
+
 ## [0.5.1] - 2021-05-09
 
 ### Added

@@ -10,7 +10,7 @@ from jeditor.core.scenemanager import JSceneManager
 from jeditor.logger import logger
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from .constants import JCONSTANTS
+from jeditor.constants import JCONSTANTS
 
 logger = logging.getLogger(__name__)
 
@@ -321,18 +321,25 @@ class JGraphicView(QtWidgets.QGraphicsView):
         self.setCursor(QtCore.Qt.ArrowCursor)
 
     def CopyGraphicsItems(self):
-        assert self._currentMode == JCONSTANTS.GRVIEW.MODE_DEFAULT, logger.error(
-            f"can only perform copy action in MODE_DEFAULT, current mode {self._currentMode}"
-        )
+        if self._currentMode != JCONSTANTS.GRVIEW.MODE_DEFAULT:
+            logger.error(
+                f"can only perform copy action in MODE_DEFAULT, current mode {self._currentMode}"
+            )
+            return
         self._sceneManager.CopyItems()
 
     def CutGraphicsItems(self):
-        assert self._currentMode == JCONSTANTS.GRVIEW.MODE_DEFAULT, logger.error(
-            f"can only perform cut action in MODE_DEFAULT, current mode {self._currentMode}"
-        )
+        if self._currentMode != JCONSTANTS.GRVIEW.MODE_DEFAULT:
+            logger.error(
+                f"can only perform cut action in MODE_DEFAULT, current mode {self._currentMode}"
+            )
+            return
+        self._sceneManager.CutItems()
 
     def PasteGraphicsItems(self):
-        assert self._currentMode == JCONSTANTS.GRVIEW.MODE_DEFAULT, logger.error(
-            f"can only perform paste action in MODE_DEFAULT, current mode {self._currentMode}"
-        )
+        if self._currentMode != JCONSTANTS.GRVIEW.MODE_DEFAULT:
+            logger.error(
+                f"can only perform paste action in MODE_DEFAULT, current mode {self._currentMode}"
+            )
+            return
         self._sceneManager.PasteItems(self._mousePosition)

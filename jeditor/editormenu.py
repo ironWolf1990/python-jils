@@ -204,7 +204,7 @@ class JMenuBar(QtWidgets.QMenuBar):
                 "Cu&t",
                 "Ctrl+X",
                 "create new graph model",
-                partial(Cut, self._editorWidget.sceneManager),
+                partial(Cut, self._editorWidget.graphicView),
             )
         )
         editMenu.addAction(
@@ -361,8 +361,9 @@ def DeselectAll(sceneManager: JSceneManager):
     logger.debug("deselect all")
 
 
-def Cut(sceneManager: JSceneManager):
+def Cut(graphicsView: JGraphicView):
     logger.debug("cut")
+    graphicsView.CutGraphicsItems()
 
 
 def Copy(graphicsView: JGraphicView):

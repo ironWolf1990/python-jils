@@ -1,4 +1,4 @@
-from jeditor.core.constants import JCONSTANTS
+from jeditor.constants import JCONSTANTS
 from jeditor.stylesheet import STYLE_SPLASH
 import typing
 from PyQt5 import QtCore

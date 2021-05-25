@@ -1,3 +1,4 @@
+from jeditor.constants import JCONSTANTS
 from jeditor.core.utils import UniqueIdentifier
 import json
 import logging
@@ -16,40 +17,27 @@ class JClipboard(QObject):
     def __init__(self, parent: typing.Optional[QObject] = None) -> None:
         super().__init__(parent=parent)
         self._copiedData: Optional[Dict] = None
+        self._mode: Optional[int] = None
+
+    def Cut(self, data: Dict):
+        self._copiedData = None
+        self._copiedData = data
+        self._mode = JCONSTANTS.CLIPBOARD.MODE_CUT
 
     def Copy(self, data: Dict):
         self._copiedData = None
         self._copiedData = data
+        self._mode = JCONSTANTS.CLIPBOARD.MODE_COPY
 
     def Paste(self, mousePosition: QPointF):
-        assert self._copiedData is not None
-        """
-        "nodes": [
-        {
-            "nodeId": "8615ece5edcb40149606f2708437f281",
-            "posX": 59.0,
-            "posY": -365.0,
-            "socketCount": 2,
-            "socketInfo": {
-                "0": {
-                    "socketId": "0dd2b8f7ecce43deaeb0c0113e2c5e38",
-                    "socketType": 1,
-                    "multiConnection": true
-                },
-                "1": {
-                    "socketId": "5298a8036413464d90d77a68c2256e52",
-                    "socketType": 2,
-                    "multiConnection": false
-                }
-            }
-        },
-        "edges": [
-        {
-            "edgeId": "b7fa01af6c544e289352fda247a14484",
-            "sourceSocketId": "7952bac66b394edd981c221a3555c06a",
-            "destinationSocketId": "0dd2b8f7ecce43deaeb0c0113e2c5e38"
-        },
-        """
+
+        if self._copiedData is None or not self._copiedData:
+            logger.warning("copied data is empty")
+            return dict()
+
+        if self._mode == JCONSTANTS.CLIPBOARD.MODE_CUT:
+            return self._copiedData
+
         minX, minY, maxX, maxY = 0, 0, 0, 0
         newSocketIds: Dict[str, str] = {}
 
@@ -108,6 +96,3 @@ class JClipboard(QObject):
             #     continue
 
         return self._copiedData
-
-    def Cut(self, data: Dict):
-        pass

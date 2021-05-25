@@ -3,7 +3,7 @@
   tasks:
     ☐ refactor nodeId, edgeId, socketId to just Id
     ✔ implement copy paste @high @done(24-05-2021 22:41)
-    ☐ implement cut @high @started(24-05-2021 22:41)
+    ✔ implement cut @high @done(25-05-2021 17:21)
     ✔ implement editor window and simple menu boilerplate @started(13-05-2021 15:26) @done(13-05-2021 23:38) @lasted(8h12m21s)
     ✔ implement undostack @started(11-05-2021 18:44) @done(11-05-2021 22:41) @lasted(3h57m52s)
     ✔ implement edge id @done(09-05-2021 20:03)
@@ -20,6 +20,7 @@
   feature:
     ☐ editor status bar shows mode and last stack operation
     ✔ implement splash screen @done(23-05-2021 23:12)
+    ✔ implement pydantic base models @high @started(25-05-2021 15:17) @done(25-05-2021 17:21) @lasted(2h4m29s)
     ✔ editor auto centers on startup @done(24-05-2021 11:33)
     ✔ application starts on primary monitor or on screen with cursor @done(24-05-2021 23:28)
 
@@ -35,7 +36,7 @@
     ✔ implement serialization @started(21-05-06 15:54) @done(21-05-08 15:20) @lasted(1d23h26m17s)
     ✔ implement deserialization @done(21-05-09 00:17)
 
-  bug checks:
+  bug:
     ✔ double check newly added edges if the sockets are updated properly @done(21-05-03 19:55)
     ☐ qt cursortype not changing based on different modes / actions being performed @low
     ✔ try to avoid circular dependancy sockets and edges @high @done(21-05-09 00:17)

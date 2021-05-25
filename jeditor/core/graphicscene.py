@@ -1,5 +1,5 @@
 from typing import List
-from .constants import JCONSTANTS
+from jeditor.constants import JCONSTANTS
 from PyQt5 import QtGui, QtWidgets, QtCore
 import math
 
