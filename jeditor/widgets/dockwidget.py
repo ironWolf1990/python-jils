@@ -37,7 +37,6 @@ class DelegateSectionOperations(QWidget):
         lable.setText(title)
 
         buttonAdd = QtWidgets.QToolButton()
-        # buttonAdd.setText("Add")
         buttonAdd.setIcon(QIcon.fromTheme("document-new"))
         buttonAdd.setCheckable(True)
         buttonAdd.setChecked(False)
@@ -53,7 +52,6 @@ class DelegateSectionOperations(QWidget):
 
         self.setLayout(QHBoxLayout())
         self.layout().setSpacing(0)
-
         self.layout().addWidget(lable)
         self.layout().addWidget(buttonAdd)
         self.layout().addWidget(buttonRemove)
@@ -63,6 +61,7 @@ class DelegateSectionOperations(QWidget):
 
     def AddChild(self):
         item = QTreeWidgetItem()
+
         item.setFlags(
             QtCore.Qt.ItemIsEnabled  # type:ignore
             | QtCore.Qt.ItemIsEditable  # type:ignore
@@ -88,7 +87,23 @@ class PropertiesTree(QTreeWidget):
         return section
 
 
-class ExDockWidget(QWidget):
+class ExDockWidget1(QDialog):
+    def __init__(self, parent: Optional[Optional[QWidget]] = None) -> None:
+        super().__init__(parent=parent)
+
+        self.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
+        # self.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(QVBoxLayout())
+        self.properties = PropertiesTree()
+        self.properties.setIndentation(8)
+        self.layout().addWidget(self.properties)
+
+        s1 = self.properties.AddPropertySection("seaction 1")
+        s2 = self.properties.AddPropertySection("section 2")
+        s3 = self.properties.AddPropertySection()
+
+
+class ExDockWidget2(QWidget):
     def __init__(self, parent: Optional[Optional[QWidget]] = None) -> None:
         super().__init__(parent=parent)
 
@@ -97,9 +112,6 @@ class ExDockWidget(QWidget):
         self.setLayout(QVBoxLayout())
         self.properties = PropertiesTree()
         self.properties.setIndentation(8)
-        # self.layout().addWidget(Xpath())
         self.layout().addWidget(self.properties)
 
         s1 = self.properties.AddPropertySection("seaction 1")
-        s2 = self.properties.AddPropertySection("section 2")
-        s3 = self.properties.AddPropertySection()

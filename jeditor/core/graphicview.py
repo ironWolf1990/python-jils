@@ -1,21 +1,23 @@
-from json.encoder import JSONEncoder
 import logging
 import typing
-from copy import deepcopy
 
+from jeditor.constants import JCONSTANTS
 from jeditor.core.graphicedge import JGraphicEdge
 from jeditor.core.graphicnode import JGraphicNode
 from jeditor.core.graphicsocket import JGraphicSocket
 from jeditor.core.scenemanager import JSceneManager
 from jeditor.logger import logger
+from jeditor.widgets.dockwidget import ExDockWidget1, ExDockWidget2
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from jeditor.constants import JCONSTANTS
-
 logger = logging.getLogger(__name__)
+import weakref
 
 
 class JGraphicView(QtWidgets.QGraphicsView):
+
+    SignalNodeDoubleClick = QtCore.pyqtSignal(object, name="david")
+
     def __init__(
         self,
         sceneManager: JSceneManager,
@@ -28,6 +30,10 @@ class JGraphicView(QtWidgets.QGraphicsView):
         self.setScene(sceneManager.graphicsScene)
 
         self.initUI()
+
+        self.o1 = ExDockWidget1()
+        self.o2 = ExDockWidget2()
+        self.tog = False
 
     def initUI(self):
 
@@ -189,6 +195,22 @@ class JGraphicView(QtWidgets.QGraphicsView):
         super().mouseReleaseEvent(event)
 
     def mouseDoubleClickEvent(self, event: QtGui.QMouseEvent) -> None:
+
+        if (
+            event.button() == QtCore.Qt.LeftButton
+            and self._currentMode == JCONSTANTS.GRVIEW.MODE_DEFAULT
+            and isinstance(
+                self.scene().itemAt(self.mapToScene(event.pos()), QtGui.QTransform()),
+                JGraphicNode,
+            )
+        ):
+            if self.tog:
+                self.SignalNodeDoubleClick.emit(weakref.ref(self.o1))
+                self.tog = not self.tog
+            elif not self.tog:
+                self.SignalNodeDoubleClick.emit(weakref.ref(self.o2))
+                self.tog = not self.tog
+
         return super().mouseDoubleClickEvent(event)
 
     def wheelEvent(self, event: QtGui.QWheelEvent):

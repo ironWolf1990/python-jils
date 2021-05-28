@@ -1,4 +1,3 @@
-from jeditor.widgets.dockwidget import ExDockWidget
 from jeditor.popup.splashscreen import StartUp
 from jeditor.editormenu import JMenuBar
 from jeditor.constants import JCONSTANTS
@@ -7,12 +6,14 @@ import typing
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import (
     QDesktopWidget,
+    QDialog,
     QDockWidget,
     QHBoxLayout,
     QMainWindow,
     QStatusBar,
     QWidget,
 )
+import weakref
 
 
 class JStatusBar(QStatusBar):
@@ -32,6 +33,9 @@ class JEditorWindow(QMainWindow):
         self._editorWidget = JEditorWidget(self)
         self.initUI()
 
+    def toggleDocket(self, a0: weakref):
+        self.dockable.setWidget(a0())
+
     def initUI(self):
 
         self.setGeometry(200, 200, JCONSTANTS.EDITOR.WIDTH, JCONSTANTS.EDITOR.HEIGHT)
@@ -43,6 +47,7 @@ class JEditorWindow(QMainWindow):
         # self.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
 
         menuBar = JMenuBar(self._editorWidget)
+        self._editorWidget.graphicView.SignalNodeDoubleClick.connect(self.toggleDocket)
         self.setMenuBar(menuBar)
 
         self.setCentralWidget(self._editorWidget)
@@ -51,7 +56,6 @@ class JEditorWindow(QMainWindow):
 
         self.dockable = QDockWidget("Node Property Dock", self)
         self.dockable.setFloating(False)
-        self.dockable.setWidget(ExDockWidget())
         self.dockable.setContentsMargins(0, 0, 0, 0)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.dockable)
 
