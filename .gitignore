@@ -91,4 +91,4 @@ setup.py
 .setup.py
 .mypy_cache
 resources/nodez
-jeditor/widgets/qac
+jigls/widgets/qac
