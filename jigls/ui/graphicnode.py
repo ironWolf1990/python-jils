@@ -1,14 +1,16 @@
-import typing
-from jigls.ui.graphicsocket import JGraphicSocket
-from jigls.jdantic import JGrNodeModel
-from jigls.base.socketbase import JBaseSocket
-from jigls.base.nodebase import JBaseNode
-from jigls.widgets.qac.contentwidget import JNodeContent
+from __future__ import annotations
+
 import logging
-import weakref
+import typing
+from typing import List, Optional
+
+from jigls.base.nodebase import JBaseNode
+from jigls.base.socketbase import JBaseSocket
 from jigls.constants import JCONSTANTS
-from typing import Dict, List, Optional, OrderedDict, Tuple
-from PyQt5 import QtGui, QtCore
+from jigls.jdantic import JGrNodeModel
+from jigls.logger import logger
+from jigls.ui.graphicsocket import JGraphicsSocket
+from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import (
     QGraphicsItem,
     QGraphicsProxyWidget,
@@ -16,12 +18,11 @@ from PyQt5.QtWidgets import (
     QStyleOptionGraphicsItem,
     QWidget,
 )
-from jigls.logger import logger
 
 logger = logging.getLogger(__name__)
 
 
-class JGraphicNode(QGraphicsItem):
+class JGraphicsNode(QGraphicsItem):
     def __init__(
         self, baseNode: JBaseNode, parent: Optional[QGraphicsItem] = None
     ) -> None:
@@ -31,7 +32,7 @@ class JGraphicNode(QGraphicsItem):
         self._baseNode: JBaseNode = baseNode
 
         # todo find a better way to draw the sockets
-        self.__graphicsSocketList: List[JGraphicSocket] = []
+        self.__graphicsSocketList: List[JGraphicsSocket] = []
 
         self.initUI()
         self.initSocketUI()
@@ -194,10 +195,10 @@ class JGraphicNode(QGraphicsItem):
             # wk = weakref.ref(socket)()
             # assert wk is not None
             self.__graphicsSocketList.append(
-                JGraphicSocket(
+                JGraphicsSocket(
                     parent=self,
                     baseSocket=socket,
-                    pos=JGraphicSocket.CalculateSocketPos(
+                    pos=JGraphicsSocket.CalculateSocketPos(
                         index=idx, position=JCONSTANTS.GRSOCKET.POS_LEFT_TOP
                     ),
                 )
@@ -206,10 +207,10 @@ class JGraphicNode(QGraphicsItem):
             # wk = weakref.ref(socket)()
             # assert wk is not None
             self.__graphicsSocketList.append(
-                JGraphicSocket(
+                JGraphicsSocket(
                     parent=self,
                     baseSocket=socket,
-                    pos=JGraphicSocket.CalculateSocketPos(
+                    pos=JGraphicsSocket.CalculateSocketPos(
                         index=idx, position=JCONSTANTS.GRSOCKET.POS_RIGHT_BOTTOM
                     ),
                 )
@@ -224,5 +225,7 @@ class JGraphicNode(QGraphicsItem):
         )
 
     @classmethod
-    def Deserialize(cls, data: Dict):
-        pass
+    def Deserialize(cls, grNode: JGrNodeModel) -> JGraphicsNode:
+        grNode_ = JGraphicsNode(baseNode=JBaseNode.Deserialize(grNode.node))
+        grNode_.setPos(QtCore.QPointF(grNode.posX, grNode.posY))
+        return grNode_

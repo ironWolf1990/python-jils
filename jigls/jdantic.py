@@ -11,6 +11,9 @@ from pydantic.types import UUID4
 class JBaseModel(PydanticBaseModel):
     __slots__ = "__weakref__"
 
+    # class Config:
+    #     json_ecoders = {UUID4: lambda v: v.hex}
+
 
 class JSocketModel(JBaseModel):
     name: str
@@ -39,8 +42,12 @@ class JEdgeModel(JBaseModel):
     destnSocket: UUID4
 
 
+class JGrEdgeModel(JBaseModel):
+    edge: JEdgeModel
+
+
 class JModel(BaseModel):
-    nodes: List[Optional[JNodeModel]]
+    nodes: List[Optional[JGrNodeModel]]
     edges: List[Optional[JEdgeModel]]
 
 
@@ -81,3 +88,15 @@ def TestPydantic():
 
 TestPydantic()
 """
+
+
+def testparse():
+    t = JModel.parse_raw(
+        '{"nodes": [{"node": {"name": "base node", "uid": "127f4fbc-e179-427f-b0ee-0bed7c71fb85", "socketList": [{"name": "out1", "uid": "1ac0efd4-e821-4c17-947b-236b83e17965", "nodId": "127f4fbc-e179-427f-b0ee-0bed7c71fb85", "index": 2, "type": 2, "multiConnection": false}, {"name": "in1", "uid": "a6d002e4-d26d-41f7-a487-af762083119c", "nodId": "127f4fbc-e179-427f-b0ee-0bed7c71fb85", "index": 1, "type": 1, "multiConnection": true}]}, "posX": 0.0, "posY": 0.0}, {"node": {"name": "base node", "uid": "1e07daf4-d378-44b4-a101-dfa9913f390b", "socketList": [{"name": "in1", "uid": "053aec7c-0b60-49e4-9368-c6e7a3ec381b", "nodId": "1e07daf4-d378-44b4-a101-dfa9913f390b", "index": 1, "type": 1, "multiConnection": true}, {"name": "out1", "uid": "202150dd-109e-4147-b3c5-56668279a75e", "nodId": "1e07daf4-d378-44b4-a101-dfa9913f390b", "index": 2, "type": 2, "multiConnection": true}]}, "posX": -75.0, "posY": 0.0}, {"node": {"name": "base node", "uid": "0663c3d9-be95-446c-ae9f-3727a043f40f", "socketList": [{"name": "in1", "uid": "db8de379-120e-49af-a8f5-470a749dd17f", "nodId": "0663c3d9-be95-446c-ae9f-3727a043f40f", "index": 1, "type": 1, "multiConnection": false}, {"name": "out1", "uid": "84569970-b392-4c64-8956-e21ef67ab3c1", "nodId": "0663c3d9-be95-446c-ae9f-3727a043f40f", "index": 2, "type": 2, "multiConnection": false}]}, "posX": -350.0, "posY": -250.0}], "edges": []}'
+    )
+
+    print(t.dict())
+    # print(t.json(indent=2))
+
+
+# testparse()

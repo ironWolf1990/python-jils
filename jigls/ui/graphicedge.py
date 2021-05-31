@@ -1,4 +1,5 @@
 from __future__ import annotations
+from jigls.jdantic import JEdgeModel
 
 import logging
 import uuid
@@ -21,16 +22,16 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from .graphicsocket import JGraphicSocket
+from .graphicsocket import JGraphicsSocket
 
 logger = logging.getLogger(__name__)
 
 
-class JGraphicEdge(QGraphicsPathItem):
+class JGraphicsEdge(QGraphicsPathItem):
     def __init__(
         self,
-        startSocket: JGraphicSocket,
-        destnSocket: Optional[JGraphicSocket] = None,
+        startSocket: JGraphicsSocket,
+        destnSocket: Optional[JGraphicsSocket] = None,
         uid: Optional[str] = None,
         parent: Optional[QGraphicsPathItem] = None,
         pathType: int = JCONSTANTS.GREDGE.PATH_BEZIER,
@@ -40,8 +41,8 @@ class JGraphicEdge(QGraphicsPathItem):
         self._uid = UniqueIdentifier() if uid is None else uid
 
         # gui purpose
-        self._startSocket: JGraphicSocket = startSocket
-        self._destnSocket: Optional[JGraphicSocket] = destnSocket
+        self._startSocket: JGraphicsSocket = startSocket
+        self._destnSocket: Optional[JGraphicsSocket] = destnSocket
         self._pathType: int = pathType
         self._dragPos: QtCore.QPointF = QtCore.QPointF()
 
@@ -101,7 +102,7 @@ class JGraphicEdge(QGraphicsPathItem):
         return self._destnSocket
 
     @destnSocket.setter
-    def destnSocket(self, socket: JGraphicSocket) -> None:
+    def destnSocket(self, socket: JGraphicsSocket) -> None:
         assert not socket.AtMaxLimit(), logger.warning(
             f"max edge limit reached for socket {socket.uid()}"
         )
@@ -185,40 +186,40 @@ class JGraphicEdge(QGraphicsPathItem):
         )
 
     def Serialize(self):
-        return OrderedDict(
-            [
-                ("edgeId", self.uid()),
-                ("startSocketId", self.startSocket.uid()),
-                ("destnSocketId", self.destnSocket.uid()),
-            ]
+        return JEdgeModel(
+            uid=self.uid(),
+            startSocket=self.startSocket.uid(),
+            destnSocket=self.destnSocket.uid(),
         )
 
     @classmethod
     def Deserialize(
-        cls, edgeId: str, startSocket: JGraphicSocket, destinationSocket: JGraphicSocket
-    ) -> Optional[JGraphicEdge]:
-        edge: Optional[JGraphicEdge] = None
+        cls,
+        uid: str,
+        startSocket: JGraphicsSocket,
+        destnSocket: JGraphicsSocket,
+    ) -> Optional[JGraphicsEdge]:
 
         if startSocket.AtMaxLimit():
             logger.error("error deserializing edge, start socket at max limit")
             return None
-        elif destinationSocket.AtMaxLimit():
+        elif destnSocket.AtMaxLimit():
             logger.error("error deserializing edge, destination socket at max limit")
             return None
 
-        return JGraphicEdge(
-            uid=edgeId,
+        return JGraphicsEdge(
+            uid=uid,
             startSocket=startSocket,
-            destnSocket=destinationSocket,
+            destnSocket=destnSocket,
             pathType=JCONSTANTS.GREDGE.PATH_BEZIER,
         )
 
     @classmethod
     def DragNewEdge(
-        cls, startSocket: JGraphicSocket, dragPos: QtCore.QPointF
-    ) -> JGraphicEdge:
+        cls, startSocket: JGraphicsSocket, dragPos: QtCore.QPointF
+    ) -> JGraphicsEdge:
         edgeId = uuid.uuid4().hex
-        instanceEdge = JGraphicEdge(
+        instanceEdge = JGraphicsEdge(
             uid=edgeId,
             startSocket=startSocket,
             destnSocket=None,

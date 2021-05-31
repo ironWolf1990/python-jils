@@ -9,6 +9,8 @@ from jigls.logger import logger
 
 logger = logging.getLogger(__name__)
 
+from operator import itemgetter, attrgetter, mul
+
 
 class JBaseNode(object):
     def __init__(
@@ -96,6 +98,7 @@ class JBaseNode(object):
                 nodeID=self.uid,
                 type=JCONSTANTS.SOCKET.TYPE_INPUT,
                 multiConnection=multiConnection,
+                uid=None,
             )
         )
 
@@ -111,6 +114,7 @@ class JBaseNode(object):
                 nodeID=self.uid,
                 type=JCONSTANTS.SOCKET.TYPE_OUTPUT,
                 multiConnection=multiConnection,
+                uid=None,
             )
         )
 
@@ -148,5 +152,49 @@ class JBaseNode(object):
             socketList=[socket.Serialize() for socket in self.socketList],
         )
 
-    def Deserialize(self, ddict: Dict):
-        pass
+    @classmethod
+    def Deserialize(cls, nodeModel: JNodeModel):
+
+        baseNode = JBaseNode(name=nodeModel.name, uid=nodeModel.uid.hex)
+
+        for socket in sorted(
+            list(
+                filter(
+                    lambda socket: socket.type == JCONSTANTS.SOCKET.TYPE_INPUT,
+                    nodeModel.socketList,
+                )
+            ),
+            key=attrgetter("index"),
+        ):
+            baseNode._socketList.add(
+                JBaseSocket(
+                    name=socket.name,
+                    uid=socket.uid.hex,
+                    nodeID=socket.nodId.hex,
+                    index=socket.index,
+                    type=socket.type,
+                    multiConnection=socket.multiConnection,
+                )
+            )
+
+        for socket in sorted(
+            list(
+                filter(
+                    lambda socket: socket.type == JCONSTANTS.SOCKET.TYPE_OUTPUT,
+                    nodeModel.socketList,
+                )
+            ),
+            key=attrgetter("index"),
+        ):
+            baseNode._socketList.add(
+                JBaseSocket(
+                    name=socket.name,
+                    uid=socket.uid.hex,
+                    nodeID=socket.nodId.hex,
+                    index=socket.index,
+                    type=socket.type,
+                    multiConnection=socket.multiConnection,
+                )
+            )
+
+        return baseNode

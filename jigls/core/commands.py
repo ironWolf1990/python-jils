@@ -1,8 +1,8 @@
 import logging
 
-from jigls.ui.graphicedge import JGraphicEdge
-from jigls.ui.graphicnode import JGraphicNode
-from jigls.ui.graphicsocket import JGraphicSocket
+from jigls.ui.graphicedge import JGraphicsEdge
+from jigls.ui.graphicnode import JGraphicsNode
+from jigls.ui.graphicsocket import JGraphicsSocket
 from jigls.logger import logger
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QGraphicsScene
@@ -11,10 +11,10 @@ logger = logging.getLogger(__name__)
 
 
 class JNodeAddCommand(QtWidgets.QUndoCommand):
-    def __init__(self, graphicScene: QGraphicsScene, node: JGraphicNode) -> None:
+    def __init__(self, graphicScene: QGraphicsScene, node: JGraphicsNode) -> None:
         super().__init__()
         self._graphicScene: QGraphicsScene = graphicScene
-        self._node: JGraphicNode = node
+        self._node: JGraphicsNode = node
         self.setText(f"add node {self._node.uid()}")
 
     def undo(self) -> None:
@@ -27,10 +27,10 @@ class JNodeAddCommand(QtWidgets.QUndoCommand):
 
 
 class JNodeRemoveCommand(QtWidgets.QUndoCommand):
-    def __init__(self, graphicScene: QGraphicsScene, node: JGraphicNode) -> None:
+    def __init__(self, graphicScene: QGraphicsScene, node: JGraphicsNode) -> None:
         super().__init__()
         self._graphicScene: QGraphicsScene = graphicScene
-        self._node: JGraphicNode = node
+        self._node: JGraphicsNode = node
         self.setText(f"remove node {self._node.uid()}")
 
     def undo(self) -> None:
@@ -61,11 +61,11 @@ class JEdgeAddCommand(QtWidgets.QUndoCommand):
     def __init__(
         self,
         graphicScene: QGraphicsScene,
-        edge: JGraphicEdge,
+        edge: JGraphicsEdge,
     ) -> None:
         super().__init__()
         self._graphicScene: QGraphicsScene = graphicScene
-        self._edge: JGraphicEdge = edge
+        self._edge: JGraphicsEdge = edge
         self._startSocket = edge.startSocket
         self.setText(f"add edge {self._edge.uid}")
 
@@ -81,10 +81,10 @@ class JEdgeAddCommand(QtWidgets.QUndoCommand):
 
 
 class JEdgeRemoveCommand(QtWidgets.QUndoCommand):
-    def __init__(self, graphicScene: QGraphicsScene, edge: JGraphicEdge) -> None:
+    def __init__(self, graphicScene: QGraphicsScene, edge: JGraphicsEdge) -> None:
         super().__init__()
         self._graphicScene: QGraphicsScene = graphicScene
-        self._edge: JGraphicEdge = edge
+        self._edge: JGraphicsEdge = edge
         self.setText(f"delete edge {self._edge.uid}")
 
     def undo(self) -> None:
@@ -102,12 +102,12 @@ class JEdgeRerouteCommand(QtWidgets.QUndoCommand):
     def __init__(
         self,
         graphicScene: QGraphicsScene,
-        edge: JGraphicEdge,
-        nDestinationSocket: JGraphicSocket,
+        edge: JGraphicsEdge,
+        nDestinationSocket: JGraphicsSocket,
     ) -> None:
         super().__init__()
         self._graphicScene: QGraphicsScene = graphicScene
-        self._edge: JGraphicEdge = edge
+        self._edge: JGraphicsEdge = edge
         self._oDestinationSocket = edge.destnSocket
         self._nDestinationSocket = nDestinationSocket
         self.setText(f"re-route edge {self._edge.uid}")

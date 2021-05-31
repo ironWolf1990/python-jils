@@ -1,3 +1,5 @@
+from pprint import pprint
+from jigls.jdantic import JModel
 import json
 import logging
 from typing import Dict, List, Optional
@@ -6,6 +8,7 @@ from jigls.logger import logger
 from PyQt5 import QtCore
 import os
 
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +17,7 @@ class JFileManager(QtCore.QObject):
     def __init__(self, parent: Optional[QtCore.QObject] = None) -> None:
         super().__init__(parent=parent)
 
-    def SaveToFile(self, data: Dict, fileName: str):
+    def SaveToFile(self, data: JModel, fileName: str):
         file = None
         if not os.path.exists(fileName):
             file = open(fileName, "x")
@@ -25,13 +28,16 @@ class JFileManager(QtCore.QObject):
         assert file, logger.error(f"file object is None")
 
         logger.info(f"saving to file {fileName}")
-        json.dump(obj=data, fp=file)
+
+        json.dump(obj=data.json(), fp=file)
         file.close()
 
-    def LoadFromFile(self, fileName: str) -> Dict:
+    def LoadFromFile(self, fileName: str) -> JModel:
 
-        assert os.path.exists(fileName), logger.error(f"{fileName} not found")
+        if not os.path.exists(fileName):
+            logger.error(f"{fileName} not found")
+            raise FileNotFoundError
 
         logger.info(f"loading from file {fileName}")
         with open(fileName, "r") as file:
-            return json.load(file)
+            return JModel.parse_raw(json.load(file))

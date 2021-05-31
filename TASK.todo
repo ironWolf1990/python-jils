@@ -2,20 +2,20 @@
 25-05-2021:
   tasks:
     ☐ imlpement content node
-    ☐ use pydantic for data serialization
+    ✔ use pydantic for data serialization @started(30-05-2021 15:57) @done(30-05-2021 22:38) @lasted(6h41m31s)
     ☐ implement property widget
     ☐ implement file operations
-    ☐ implement dock
+    ✔ implement simple dock @done(30-05-2021 22:38)
 
   feature:
-    ☐ model json schema
+    ✔ model json schema @done(30-05-2021 22:39)
     ☐ model xml schema
     ☐ implement qgraphicsgroup @low
 
 
 09-05-2021:
   tasks:
-    ☐ refactor nodeId, edgeId, socketId to just Id
+    ✔ refactor nodeId, edgeId, socketId to just Id @done(30-05-2021 15:57)
     ✔ implement copy paste @high @done(24-05-2021 22:41)
     ✔ implement cut @high @done(25-05-2021 17:21)
     ✔ implement editor window and simple menu boilerplate @started(13-05-2021 15:26) @done(13-05-2021 23:38) @lasted(8h12m21s)

@@ -3,7 +3,7 @@ class JCONSTANTS:
         WIDTH: int = 1280
         HEIGHT: int = 900
         TITLE: str = "J-Editor"
-        SPLASH: bool = True
+        SPLASH: bool = False
         SPLASH_IMAGE: str = r"resources/splash.png"
         SPLASH_TIME: int = 1700
         START_CENTER_ON_MOUSE = False

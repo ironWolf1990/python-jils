@@ -1,7 +1,7 @@
 from jigls.constants import JCONSTANTS
-from jigls.ui.graphicedge import JGraphicEdge
+from jigls.ui.graphicedge import JGraphicsEdge
 from PyQt5.QtCore import QObject, QPointF
-from jigls.ui.graphicsocket import JGraphicSocket
+from jigls.ui.graphicsocket import JGraphicsSocket
 import logging
 from typing import Optional, Tuple
 from PyQt5 import QtWidgets
@@ -14,14 +14,14 @@ logger = logging.getLogger(__name__)
 class JEdgeDragging(QObject):
     def __init__(self, graphicsScene: QtWidgets.QGraphicsScene):
         self._graphicsScene = graphicsScene
-        self._startSocket: Optional[JGraphicSocket] = None
-        self._destinationSocket: Optional[JGraphicSocket] = None
+        self._startSocket: Optional[JGraphicsSocket] = None
+        self._destinationSocket: Optional[JGraphicsSocket] = None
         self._dragPosition: QPointF = QPointF()
-        self._tempEdge: Optional[JGraphicEdge] = None
+        self._tempEdge: Optional[JGraphicsEdge] = None
 
     def StartDrag(self, startSocket: QtWidgets.QGraphicsItem) -> bool:
 
-        assert isinstance(startSocket, JGraphicSocket)
+        assert isinstance(startSocket, JGraphicsSocket)
 
         # todo enable drawing edge from input socket
         if startSocket.socketType() == JCONSTANTS.SOCKET.TYPE_INPUT:
@@ -32,7 +32,7 @@ class JEdgeDragging(QObject):
 
         if startSocket.multiConnection():
 
-            self._tempEdge = JGraphicEdge.DragNewEdge(
+            self._tempEdge = JGraphicsEdge.DragNewEdge(
                 startSocket=startSocket,
                 dragPos=startSocket.scenePos(),
             )
@@ -46,7 +46,7 @@ class JEdgeDragging(QObject):
 
         elif not startSocket.AtMaxLimit():
 
-            self._tempEdge = JGraphicEdge.DragNewEdge(
+            self._tempEdge = JGraphicsEdge.DragNewEdge(
                 startSocket=startSocket,
                 dragPos=startSocket.scenePos(),
             )
@@ -75,7 +75,7 @@ class JEdgeDragging(QObject):
         assert self._tempEdge is not None
         flag: Optional[bool] = None
 
-        if isinstance(destnSocket, JGraphicSocket):
+        if isinstance(destnSocket, JGraphicsSocket):
             # * check same socket
             if self._startSocket.uid() == destnSocket.uid():
                 logger.warning(f"tried connecting same socket")
@@ -100,8 +100,8 @@ class JEdgeDragging(QObject):
                 len(
                     list(
                         filter(
-                            lambda edge: isinstance(edge, JGraphicEdge)
-                            and isinstance(destnSocket, JGraphicSocket)
+                            lambda edge: isinstance(edge, JGraphicsEdge)
+                            and isinstance(destnSocket, JGraphicsSocket)
                             and edge.uid() != self._tempEdge.uid()
                             and edge.startSocket.uid()
                             == self._tempEdge.startSocket.uid()
@@ -120,7 +120,7 @@ class JEdgeDragging(QObject):
                 logger.debug("adding new edge")
                 flag = True
 
-        elif not isinstance(destnSocket, JGraphicSocket):
+        elif not isinstance(destnSocket, JGraphicsSocket):
             logger.warning(f"clicked none socket type")
             flag = False
 
@@ -136,7 +136,7 @@ class JEdgeDragging(QObject):
             self.Reset()
             return False
         elif flag:
-            assert isinstance(destnSocket, JGraphicSocket)
+            assert isinstance(destnSocket, JGraphicsSocket)
             self._tempEdge.destnSocket = destnSocket
 
             # ! this step is done so that the logic can be handeled in redo for EdgeAddCommand
@@ -146,7 +146,7 @@ class JEdgeDragging(QObject):
         return False
 
     def Reset(self):
-        assert isinstance(self._tempEdge, JGraphicEdge)
+        assert isinstance(self._tempEdge, JGraphicsEdge)
         self._tempEdge.update()
         self._startSocket = None
         self._destinationSocket = None
@@ -158,15 +158,15 @@ class JEdgeRerouting(QObject):
     def __init__(self, graphicsScene: QtWidgets.QGraphicsScene):
         self._graphicsScene = graphicsScene
 
-        self._startSocket: Optional[JGraphicSocket] = None
-        self._oDestinationSocket: Optional[JGraphicSocket] = None
-        self._nDestinationSocket: Optional[JGraphicSocket] = None
+        self._startSocket: Optional[JGraphicsSocket] = None
+        self._oDestinationSocket: Optional[JGraphicsSocket] = None
+        self._nDestinationSocket: Optional[JGraphicsSocket] = None
         self._dragPosition: QPointF = QPointF()
 
-        self._tempEdge: Optional[JGraphicEdge] = None
+        self._tempEdge: Optional[JGraphicsEdge] = None
 
     def StartRerouting(self, edge: QtWidgets.QGraphicsItem, tempDragPos: QPointF):
-        assert isinstance(edge, JGraphicEdge)
+        assert isinstance(edge, JGraphicsEdge)
         assert self._tempEdge is None, logger.error(
             "re-routing a new edge while previous edge re-routing is not finished / not reset to none"
         )
@@ -191,7 +191,7 @@ class JEdgeRerouting(QObject):
         assert self._tempEdge is not None
         flag: Optional[bool] = None
 
-        if isinstance(destnSocket, JGraphicSocket):
+        if isinstance(destnSocket, JGraphicsSocket):
             # * check same socket
             if self._startSocket.uid() == destnSocket.uid():
                 logger.warning(f"tried connecting to start socket")
@@ -222,8 +222,8 @@ class JEdgeRerouting(QObject):
                 len(
                     list(
                         filter(
-                            lambda edge: isinstance(edge, JGraphicEdge)
-                            and isinstance(destnSocket, JGraphicSocket)
+                            lambda edge: isinstance(edge, JGraphicsEdge)
+                            and isinstance(destnSocket, JGraphicsSocket)
                             and edge.uid() != self._tempEdge.uid()
                             and edge.startSocket.uid()
                             == self._tempEdge.startSocket.uid()
@@ -241,37 +241,37 @@ class JEdgeRerouting(QObject):
             else:
                 flag = True
 
-        elif not isinstance(destnSocket, JGraphicSocket):
+        elif not isinstance(destnSocket, JGraphicsSocket):
             logger.warning(f"clicked none socket type")
             flag = False
 
         if flag is None:
             logger.error("unhandled condition")
-            assert isinstance(self._oDestinationSocket, JGraphicSocket)
+            assert isinstance(self._oDestinationSocket, JGraphicsSocket)
             self._tempEdge.destnSocket = self._oDestinationSocket
             self.Reset()
             return False
 
         elif not flag:
             logger.error("edge re-routing failed, reverting to previous connection")
-            assert isinstance(self._oDestinationSocket, JGraphicSocket)
+            assert isinstance(self._oDestinationSocket, JGraphicsSocket)
             self._tempEdge.destnSocket = self._oDestinationSocket
             self.Reset()
             return False
 
         elif flag:
             logger.debug("re-routing edge")
-            assert isinstance(destnSocket, JGraphicSocket)
+            assert isinstance(destnSocket, JGraphicsSocket)
             self._nDestinationSocket = destnSocket
 
             # ! this step is done so that the logic can be handeled in redo for EdgeAddCommand
-            assert isinstance(self._oDestinationSocket, JGraphicSocket)
+            assert isinstance(self._oDestinationSocket, JGraphicsSocket)
             self._tempEdge.destnSocket = self._oDestinationSocket
             return True
         return False
 
     def Reset(self):
-        assert isinstance(self._tempEdge, JGraphicEdge)
+        assert isinstance(self._tempEdge, JGraphicsEdge)
         self._tempEdge.update()
         self._startSocket = None
         self._oDestinationSocket = None

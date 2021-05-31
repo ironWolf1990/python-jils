@@ -1,7 +1,7 @@
 from jigls.base.nodebase import JBaseNode
 from typing import Optional
 from jigls.constants import JCONSTANTS
-from jigls.ui.graphicnode import JGraphicNode
+from jigls.ui.graphicnode import JGraphicsNode
 import uuid
 
 
@@ -12,12 +12,12 @@ class JNodeFactory:
     def RegisterNode(self):
         pass
 
-    def CreateNode(self, inputMulti, outputMulti, inputs=1, output=1, *args, **kwargs):
+    def CreateNode(self, inputMulti, outputMulti, inputs=2, output=1, *args, **kwargs):
 
         base = JBaseNode("base node")
-        for _ in range(inputs):
+        for i in range(inputs):
             base.AddInputSocket(
-                name="in1",
+                name=f"in{i}",
                 multiConnection=inputMulti,
             )
         for _ in range(output):
@@ -25,6 +25,6 @@ class JNodeFactory:
                 name="out1",
                 multiConnection=outputMulti,
             )
-        node = JGraphicNode(base)
+        node = JGraphicsNode(base)
 
         return node

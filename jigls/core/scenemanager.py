@@ -21,10 +21,10 @@ from .commands import (
     JNodeRemoveCommand,
 )
 from jigls.constants import JCONSTANTS
-from jigls.ui.graphicedge import JGraphicEdge
-from jigls.ui.graphicnode import JGraphicNode
+from jigls.ui.graphicedge import JGraphicsEdge
+from jigls.ui.graphicnode import JGraphicsNode
 from .graphicscene import JGraphicScene
-from jigls.ui.graphicsocket import JGraphicSocket
+from jigls.ui.graphicsocket import JGraphicsSocket
 
 logger = logging.getLogger(__name__)
 
@@ -81,10 +81,13 @@ class JSceneManager(QtCore.QObject):
         for gItem in self._dataStreamer.Deserialize(
             self._fileManager.LoadFromFile(fileName=fileName)
         ):
+            if gItem is None:
+                logger.error(f"deserialization error, got 'None' item")
+                continue
             self._graphicsScene.addItem(gItem)
 
     def StartEdgeDrag(self, item: QtWidgets.QGraphicsItem) -> bool:
-        assert isinstance(item, JGraphicSocket)
+        assert isinstance(item, JGraphicsSocket)
         return self._edgeDragging.StartDrag(item)
 
     def EndEdgeDrag(self, item: QtWidgets.QGraphicsItem) -> bool:
@@ -119,10 +122,10 @@ class JSceneManager(QtCore.QObject):
 
         item = self._graphicsScene.selectedItems()[0]
 
-        if not isinstance(item, JGraphicEdge):
+        if not isinstance(item, JGraphicsEdge):
             logger.warning("none edge type selected for rerouting")
             return False
-        elif isinstance(item, JGraphicEdge):
+        elif isinstance(item, JGraphicsEdge):
             self._edgeReroute.StartRerouting(item, cursorPos)
             return True
 
@@ -160,13 +163,13 @@ class JSceneManager(QtCore.QObject):
         nodeIdRemove: typing.Set[str] = set()
 
         for item in self._graphicsScene.selectedItems():
-            if isinstance(item, JGraphicNode):
+            if isinstance(item, JGraphicsNode):
                 nodeIdRemove.add(item.uid())
                 for socket in item.GetSocketList():
                     edgeIdRemove |= set(socket.edgeList)
-            elif isinstance(item, JGraphicEdge):
+            elif isinstance(item, JGraphicsEdge):
                 edgeIdRemove.add(item.uid())
-            elif isinstance(item, JGraphicSocket):
+            elif isinstance(item, JGraphicsSocket):
                 # * socket are removed with nodes
                 pass
             else:
@@ -192,7 +195,7 @@ class JSceneManager(QtCore.QObject):
     def RemoveNodeFromScene(self, nodeId: str):
         node_ = list(
             filter(
-                lambda node: isinstance(node, JGraphicNode) and node.uid() == nodeId,
+                lambda node: isinstance(node, JGraphicsNode) and node.uid() == nodeId,
                 self._graphicsScene.items(),
             )
         )
@@ -203,7 +206,7 @@ class JSceneManager(QtCore.QObject):
             return
 
         node__ = node_[0]
-        assert isinstance(node__, JGraphicNode)
+        assert isinstance(node__, JGraphicsNode)
 
         logger.debug(f"remove node {nodeId}")
         self.undoStack.beginMacro("remove node")
@@ -215,7 +218,7 @@ class JSceneManager(QtCore.QObject):
     def RemoveEdgeFromScene(self, edgeId: str):
         edge_ = list(
             filter(
-                lambda edge: isinstance(edge, JGraphicEdge) and edge.uid() == edgeId,
+                lambda edge: isinstance(edge, JGraphicsEdge) and edge.uid() == edgeId,
                 self._graphicsScene.items(),
             )
         )
@@ -226,7 +229,7 @@ class JSceneManager(QtCore.QObject):
             return
 
         edge__ = edge_[0]
-        assert isinstance(edge__, JGraphicEdge)
+        assert isinstance(edge__, JGraphicsEdge)
 
         logger.debug(f"remove edge {edgeId}")
         self.undoStack.beginMacro("remove edge")
@@ -238,15 +241,15 @@ class JSceneManager(QtCore.QObject):
     def DebugSceneInformation(self):
         print(f"\n{30*'='}\n{10*'-'} SCENE NODES")
         for item in self._graphicsScene.items():
-            if isinstance(item, (JGraphicNode)):
+            if isinstance(item, JGraphicsNode):
                 print(item)
         print(f"{10*'-'} SCENE EDGES")
         for item in self._graphicsScene.items():
-            if isinstance(item, (JGraphicEdge)):
+            if isinstance(item, JGraphicsEdge):
                 print(item)
         print(f"{10*'-'} SCENE SOCKET")
         for item in self._graphicsScene.items():
-            if isinstance(item, (JGraphicSocket)):
+            if isinstance(item, JGraphicsSocket):
                 print(item)
         print(f"{30*'='}\n")
 
@@ -266,18 +269,18 @@ class JSceneManager(QtCore.QObject):
         logger.info("pasting selected item")
 
         genPaste = self._clipboard.Paste(mousePosition)
-        if not genPaste:
+        if genPaste is None:
             logger.warning("no graphic items to paste")
             return
 
         self._undoStack.beginMacro("pasting items")
         for gItem in self._dataStreamer.Deserialize(genPaste):
-            if isinstance(gItem, JGraphicNode):
+            if isinstance(gItem, JGraphicsNode):
                 self._undoStack.beginMacro("pasting node")
                 self._undoStack.push(JNodeAddCommand(self._graphicsScene, gItem))
                 self._undoStack.endMacro()
 
-            if isinstance(gItem, JGraphicEdge):
+            if isinstance(gItem, JGraphicsEdge):
                 gItem.DisconnectFromSockets()
                 self._undoStack.beginMacro("pasting node")
                 self._undoStack.push(JEdgeAddCommand(self._graphicsScene, gItem))

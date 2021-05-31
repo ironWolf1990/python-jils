@@ -2,9 +2,9 @@ import logging
 import typing
 
 from jigls.constants import JCONSTANTS
-from jigls.ui.graphicedge import JGraphicEdge
-from jigls.ui.graphicnode import JGraphicNode
-from jigls.ui.graphicsocket import JGraphicSocket
+from jigls.ui.graphicedge import JGraphicsEdge
+from jigls.ui.graphicnode import JGraphicsNode
+from jigls.ui.graphicsocket import JGraphicsSocket
 from jigls.core.scenemanager import JSceneManager
 from jigls.logger import logger
 from jigls.widgets.dockwidget import ExDockWidget1, ExDockWidget2
@@ -105,7 +105,7 @@ class JGraphicView(QtWidgets.QGraphicsView):
             and self._currentMode == JCONSTANTS.GRVIEW.MODE_DEFAULT
             and isinstance(
                 self.scene().itemAt(self.mapToScene(event.pos()), QtGui.QTransform()),
-                JGraphicSocket,
+                JGraphicsSocket,
             )
         ):
             self.StartEdgeDrag(
@@ -201,7 +201,7 @@ class JGraphicView(QtWidgets.QGraphicsView):
             and self._currentMode == JCONSTANTS.GRVIEW.MODE_DEFAULT
             and isinstance(
                 self.scene().itemAt(self.mapToScene(event.pos()), QtGui.QTransform()),
-                JGraphicNode,
+                JGraphicsNode,
             )
         ):
             if self.tog:
@@ -322,7 +322,7 @@ class JGraphicView(QtWidgets.QGraphicsView):
         return painterPath
 
     def StartEdgeDrag(self, item: QtWidgets.QGraphicsItem):
-        assert isinstance(item, JGraphicSocket)
+        assert isinstance(item, JGraphicsSocket)
         if self._sceneManager.StartEdgeDrag(item):
             self._currentMode = JCONSTANTS.GRVIEW.MODE_EDGE_DRAG
             self.setCursor(QtCore.Qt.DragLinkCursor)

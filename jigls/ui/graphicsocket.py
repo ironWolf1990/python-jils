@@ -16,7 +16,7 @@ from jigls.constants import JCONSTANTS
 logger = logging.getLogger(__name__)
 
 
-class JGraphicSocket(QGraphicsItem):
+class JGraphicsSocket(QGraphicsItem):
     def __init__(
         self, parent: QGraphicsItem, baseSocket: JBaseSocket, pos: QtCore.QPointF
     ) -> None:
