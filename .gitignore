@@ -83,8 +83,6 @@ result/*
 logs/*
 !logs/.gitkeep
 data/json/*.json
-test/*.**
-!test/testcore.py
 results/*.**
 !*/.gitkeep
 setup.py
@@ -93,4 +91,3 @@ setup.py
 resources/nodez
 jigls/widgets/qac
 jigls/jcore/ccore
-testicore.py
