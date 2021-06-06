@@ -7,9 +7,13 @@ def _iOpNot(a: bool):
     return not a
 
 
+def _iOpAdd(a: bool, b: bool):
+    return a and b
+
+
 class iGate2Node(INode):
     def __init__(self, name):
-        super().__init__(name, monitor=True)
+        super().__init__(name, traceback=True)
         self.AddSocket(
             ISocket(
                 pNode=self,
@@ -37,8 +41,8 @@ class iGate2Node(INode):
 
 
 class iNot(INode):
-    def __init__(self, name):
-        super().__init__(name, monitor=True)
+    def __init__(self, name, traceback=False):
+        super().__init__(name, traceback=traceback)
         self.AddSocket(
             ISocket(
                 pNode=self,
@@ -55,14 +59,34 @@ class iNot(INode):
                 dataType=bool,
             )
         )
-        self.AddOperation(
-            JOperation(name="Not", inputs=["A"], outputs=["B"], fn=_iOpNot)
+        self.AddOperation(JOperation(name="Not", inputs=["A"], outputs=["B"], fn=_iOpNot))
+
+
+class iAnd(INode):
+    def __init__(self, name, traceback=False):
+        super().__init__(name, traceback=traceback)
+        self.AddSocket(
+            ISocket(
+                pNode=self,
+                name="A",
+                type=JCONSTANTS.SOCKET.TYPE_INPUT,
+                dataType=bool,
+            )
         )
-
-
-# class And(Gate2Node):
-#     def __init__(self, name):
-#         Gate2Node.__init__(self, name)
-
-#     def Compute(self):
-#         self.C.Set(self.A._data and self.B._data)
+        self.AddSocket(
+            ISocket(
+                pNode=self,
+                name="B",
+                type=JCONSTANTS.SOCKET.TYPE_INPUT,
+                dataType=bool,
+            )
+        )
+        self.AddSocket(
+            ISocket(
+                pNode=self,
+                name="C",
+                type=JCONSTANTS.SOCKET.TYPE_OUTPUT,
+                dataType=bool,
+            )
+        )
+        self.AddOperation(JOperation(name="Not", inputs=["A", "B"], outputs=["C"], fn=_iOpAdd))

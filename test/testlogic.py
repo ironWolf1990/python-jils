@@ -10,8 +10,8 @@ class TestCore(unittest.TestCase):
         a = And("A1")
         # a.C.monitorOnChange = True
         a.A.Set(True)
-        a.B.Set(True)
-        self.assertEqual(a.C.Get(), True)
+        a.B.Set(False)
+        self.assertEqual(a.C.Get(), False)
 
     def test_and_not(self):
         a = And("A1")
@@ -39,6 +39,28 @@ class TestCore(unittest.TestCase):
 
         o1.A.Set(True)
         self.assertEqual(o1.C.Get(), False)
+
+    def test_multiout(self):
+        a = And("A1")
+        # a.C.monitorOnChange = True
+        a.A.Set(True)
+        a.B.Set(True)
+        self.assertEqual(a.C.Get(), True)
+
+        n = Not("N1")
+        N = Not("N1")
+        N_ = Not("N1")
+
+        a.C.Connect(n.A)
+        a.C.Connect(N.A)
+        N.B.Connect(N_.A)
+
+        # n.B.monitorOnChange = True
+        a.B.Set(False)
+        self.assertEqual(a.C.Get(), False)
+        self.assertEqual(n.B.Get(), True)
+        self.assertEqual(N.B.Get(), True)
+        self.assertEqual(N_.B.Get(), False)
 
     def test_halfadder(self):
         h1 = HalfAdder("H1")
