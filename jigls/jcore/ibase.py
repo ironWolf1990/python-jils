@@ -258,15 +258,15 @@ class ISocket(JAbstractBase):
         # * input can connect to input (used for gouping nodes)
         # * output can connect to input
         # * output can connect to output (used for data forwarding)
-        # if self.Type == JCONSTANTS.SOCKET.TYPE_INPUT and cSocket.Type == JCONSTANTS.SOCKET.TYPE_OUTPUT:
-        #     logger.error(
-        #         f"node:{self.pNode.name} sock:{self.name} cannot connect to node:{cSocket.pNode.name} sock:{cSocket.name}, input cannot connect to output"
-        #     )
-        #     return
+        if self.Type == JCONSTANTS.SOCKET.TYPE_INPUT and cSocket.Type == JCONSTANTS.SOCKET.TYPE_OUTPUT:
+            if self._traceback:
+                logger.warning(
+                    f"node:{self.pNode.name} sock:{self.name} connect to node:{cSocket.pNode.name} sock:{cSocket.name}, input connect to output. Set() and Dirty() will not be called for this connection"
+                )
 
         if cSocket.dataType() != self.dataType():
             logger.error(
-                f"node:{self.pNode.name} sock:{self.name} cannot connect to node:{cSocket.pNode.name} sock:{cSocket.name} ,datatype missmatch {self.data} {cSocket.dataType}"
+                f"node:{self.pNode.name} sock:{self.name} cannot connect to node:{cSocket.pNode.name} sock:{cSocket.name}, datatype missmatch {self.data} {cSocket.dataType}"
             )
             return
 
