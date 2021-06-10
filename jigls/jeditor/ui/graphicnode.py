@@ -50,6 +50,10 @@ class JGraphicsNode(QGraphicsItem):
     def nodeTypeName(self):
         return self.__NODE__
 
+    @property
+    def graphicsSocketList(self) -> List[JGraphicsSocket]:
+        return self.__graphicsSocketList
+
     def GetNodeName(self) -> str:
         return self.baseNode.name
 

@@ -161,11 +161,19 @@ class JSceneManager(QtCore.QObject):
         for item in self._graphicsScene.selectedItems():
             if isinstance(item, JGraphicsNode):
                 nodeIdRemove.add(item.uid())
+
+                for gSocket in item.graphicsSocketList:
+                    for edge in self._graphicsScene.items():
+                        if isinstance(edge, JGraphicsEdge):
+                            if any(
+                                gSocket.uid() == socket.uid()
+                                for socket in (edge.startSocket, edge.destnSocket)
+                            ):
+                                edgeIdRemove.add(edge.uid())
+
             elif isinstance(item, JGraphicsEdge):
                 edgeIdRemove.add(item.uid())
-            elif isinstance(item, JGraphicsSocket):
-                # * socket are removed with nodes
-                pass
+
             else:
                 logger.debug(f"unknown item selected in delete type {type(item)}")
 
