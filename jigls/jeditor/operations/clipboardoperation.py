@@ -16,36 +16,35 @@ from pprint import pprint
 class JClipboard(QObject):
     def __init__(self, parent: typing.Optional[QObject] = None) -> None:
         super().__init__(parent=parent)
-        self._copiedData: Optional[JModel] = None
+        self._clipboardData: Optional[JModel] = None
         self._mode: Optional[int] = None
 
     def Cut(self, data: JModel):
-        self._copiedData = None
-        self._copiedData = data
+        self._clipboardData = None
+        self._clipboardData = data
         self._mode = JCONSTANTS.CLIPBOARD.MODE_CUT
 
     def Copy(self, data: JModel):
-        self._copiedData = None
-        self._copiedData = data
+        self._clipboardData = None
+        self._clipboardData = data
         self._mode = JCONSTANTS.CLIPBOARD.MODE_COPY
 
     def Paste(self, mousePosition: QPointF) -> Optional[JModel]:
 
-        if self._copiedData is None or not self._copiedData:
+        if self._clipboardData is None or not self._clipboardData:
             logger.warning("copied data is empty")
             return None
 
         if self._mode == JCONSTANTS.CLIPBOARD.MODE_CUT:
-            return self._copiedData
+            return self._clipboardData
 
         minX, minY, maxX, maxY = 0, 0, 0, 0
-        newSocketIds: Dict[UUID, UUID] = {}
+        newSocketIds: Dict[str, str] = {}
 
-        for grNode in self._copiedData.nodes:
+        for grNode in self._clipboardData.nodes:
 
             # * assign new node id
-            oId = grNode.node.uid.hex
-            grNode.node.uid = UUID(UniqueIdentifier())
+            grNode.node.uid = UniqueIdentifier()
 
             # * calculate centre position to paste
             x = grNode.posX
@@ -62,21 +61,21 @@ class JClipboard(QObject):
             # * assign socket id, keep old to replace in edges
             for socket in grNode.node.socketList:
                 oSocketId = socket.uid
-                nSocketID = UUID(UniqueIdentifier())
+                nSocketID = UniqueIdentifier()
                 socket.uid = nSocketID
                 newSocketIds.update({oSocketId: nSocketID})
 
         offsetX = mousePosition.x() - (minX + maxX) / 2
         offsetY = mousePosition.y() - (minY + maxY) / 2
 
-        for grNode in self._copiedData.nodes:
+        for grNode in self._clipboardData.nodes:
             grNode.posX += offsetX
             grNode.posX += offsetY
 
-        for edge in self._copiedData.edges:
+        for edge in self._clipboardData.edges:
 
             # * new edge id
-            edge.uid = UUID(UniqueIdentifier())
+            edge.uid = UniqueIdentifier()
 
             # * replace old socket ids
             ssId = newSocketIds.get(edge.startSocket, None)
@@ -95,4 +94,4 @@ class JClipboard(QObject):
             #     self._copiedData["edges"].remove(edge)
             #     continue
 
-        return self._copiedData
+        return self._clipboardData

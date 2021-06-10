@@ -1,3 +1,4 @@
+from __future__ import annotations
 from jigls.jcore.ibase import INode, ISocket
 from jigls.jeditor.jdantic import JNodeModel
 from jigls.jeditor.constants import JCONSTANTS
@@ -17,8 +18,7 @@ class JBaseNode(INode):
     def __init__(self, name: str, uid: Optional[str] = None) -> None:
         super().__init__(name, uid=uid)
 
-    @property
-    def inSocketList(self) -> List[JBaseSocket]:
+    def InSocketList(self) -> List[JBaseSocket]:
         return list(  # type:ignore
             filter(
                 lambda socket: socket.Type == JCONSTANTS.SOCKET.TYPE_INPUT,
@@ -26,8 +26,7 @@ class JBaseNode(INode):
             )
         )
 
-    @property
-    def outSocketList(self) -> List[JBaseSocket]:
+    def OutSocketList(self) -> List[JBaseSocket]:
         return list(  # type:ignore
             filter(
                 lambda socket: socket.Type == JCONSTANTS.SOCKET.TYPE_OUTPUT,
@@ -53,57 +52,30 @@ class JBaseNode(INode):
         return super().__repr__()
 
     def Serialize(self):
-        pass
-        # return JNodeModel(
-        #     name=self.name,
-        #     uid=self.uid,
-        #     socketList=[socket.Serialize() for socket in self.socketList],
-        # )
+        return JNodeModel(
+            name=self.name,
+            uid=self.uid,
+            socketList=[
+                socket_.Serialize()
+                for sockets in (self.InSocketList(), self.OutSocketList())
+                for socket_ in sockets
+            ],
+        )
 
     @classmethod
-    def Deserialize(cls, nodeModel: JNodeModel):
-        pass
+    def Deserialize(cls, nodeModel: JNodeModel) -> JBaseNode:
 
-        # baseNode = JBaseNode(name=nodeModel.name, uid=nodeModel.uid.hex)
+        baseNode = JBaseNode(name=nodeModel.name, uid=nodeModel.uid)
 
-        # for socket in sorted(
-        #     list(
-        #         filter(
-        #             lambda socket: socket.type == JCONSTANTS.SOCKET.TYPE_INPUT,
-        #             nodeModel.socketList,
-        #         )
-        #     ),
-        #     key=attrgetter("index"),
-        # ):
-        #     baseNode._socketList.add(
-        #         JBaseSocket(
-        #             name=socket.name,
-        #             uid=socket.uid.hex,
-        #             nodeID=socket.nodId.hex,
-        #             index=socket.index,
-        #             type=socket.type,
-        #             multiConnection=socket.multiConnection,
-        #         )
-        #     )
+        for socket in nodeModel.socketList:
+            baseNode.AddSocket(
+                JBaseSocket.Deserialize(
+                    pNode=baseNode,
+                    name=socket.name,
+                    uid=socket.uid,
+                    type=socket.type,
+                    multiConnect=socket.multiConnect,
+                )
+            )
 
-        # for socket in sorted(
-        #     list(
-        #         filter(
-        #             lambda socket: socket.type == JCONSTANTS.SOCKET.TYPE_OUTPUT,
-        #             nodeModel.socketList,
-        #         )
-        #     ),
-        #     key=attrgetter("index"),
-        # ):
-        #     baseNode._socketList.add(
-        #         JBaseSocket(
-        #             name=socket.name,
-        #             uid=socket.uid.hex,
-        #             nodeID=socket.nodId.hex,
-        #             index=socket.index,
-        #             type=socket.type,
-        #             multiConnection=socket.multiConnection,
-        #         )
-        #     )
-
-        # return baseNode
+        return baseNode

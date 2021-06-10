@@ -92,10 +92,6 @@ class JEdgeDragging(QObject):
                 logger.warning(f"socket belong to same parent")
                 flag = False
 
-            elif not isinstance(destnSocket, JGraphicsSocket):
-                logger.warning(f"clicked none socket type")
-                flag = False
-
             elif (
                 len(
                     list(
@@ -118,6 +114,10 @@ class JEdgeDragging(QObject):
             else:
                 logger.debug("adding new edge")
                 flag = True
+
+        elif not isinstance(destnSocket, JGraphicsSocket):
+            logger.warning(f"clicked none socket type")
+            flag = False
 
         if flag is None:
             logger.error("unhandled condition")

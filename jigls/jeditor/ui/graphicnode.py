@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 class JGraphicsNode(QGraphicsItem):
 
-    __NODE__: str = "Base Web Node"
+    __NODE__: str = "BaseNode"
 
     def __init__(
         self,
@@ -67,10 +67,10 @@ class JGraphicsNode(QGraphicsItem):
         return self.baseNode.socketList
 
     def GetInSocketList(self) -> List[JBaseSocket]:
-        return self.baseNode.inSocketList
+        return self.baseNode.InSocketList()
 
     def GetOutSocketList(self) -> List[JBaseSocket]:
-        return self.baseNode.outSocketList
+        return self.baseNode.OutSocketList()
 
     def GetSocketByName(self, name: str) -> Optional[ISocket]:
         return self.baseNode.GetSocketByName(name)
@@ -217,12 +217,10 @@ class JGraphicsNode(QGraphicsItem):
         return self.baseNode.__repr__()
 
     def Serialize(self):
-        pass
-        # return JGrNodeModel(node=self.baseNode.Serialize(), posX=self.pos().x(), posY=self.pos().y())
+        return JGrNodeModel(node=self.baseNode.Serialize(), posX=self.pos().x(), posY=self.pos().y())
 
     @classmethod
     def Deserialize(cls, grNode: JGrNodeModel):
-        pass
-        # grNode_ = JGraphicsNode(baseNode=JBaseNode.Deserialize(grNode.node))
-        # grNode_.setPos(QtCore.QPointF(grNode.posX, grNode.posY))
-        # return grNode_
+        grNode_ = JGraphicsNode(baseNode=JBaseNode.Deserialize(grNode.node))
+        grNode_.setPos(QtCore.QPointF(grNode.posX, grNode.posY))
+        return grNode_

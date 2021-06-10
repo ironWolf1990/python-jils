@@ -1,4 +1,5 @@
 from __future__ import annotations
+from jigls.jeditor.jdantic import JSocketModel
 
 import typing
 from jigls.jcore.ibase import INode, ISocket
@@ -40,35 +41,34 @@ class JBaseSocket(ISocket):
     def __repr__(self) -> str:
         return f"{super().__repr__()} multiConnect: {self._multiConnect}"
 
-    def Serialize(self):
-        pass
-        # -> JSocketModel:
-        # return JSocketModel(
-        #     name=self.name,
-        #     uid=self.uid,
-        #     nodId=self.nodeId,
-        #     index=self.index,
-        #     type=self.type,
-        #     multiConnection=self.multiConnect,
-        # )
+    def Serialize(self) -> JSocketModel:
+
+        """
+        name: str
+        uid: str
+        type: int
+        multiConnect: bool
+        dataType: Callable
+        default: Optional[Any]
+        exec: bool
+        execOnChange: bool
+        execOnConnect: bool
+        monitorOnChange: bool
+        traceback: bool
+        """
+        return JSocketModel(
+            name=self.name,
+            uid=self.uid,
+            type=self.Type,
+            multiConnect=self.multiConnect,
+            dataType=self.dataType.__name__,
+            exec=self.exec,
+            execOnChange=self.execOnChange,
+            execOnConnect=self.execOnConnect,
+            monitorOnChange=self.monitorOnChange,
+            traceback=self.traceback,
+        )
 
     @classmethod
-    def Deserialize(cls):
-        pass
-
-    #     cls,
-    #     name: str,
-    #     uid: str,
-    #     nodeId: str,
-    #     index: int,
-    #     type: int,
-    #     multiConnection: bool,
-    # ):
-    #     return JBaseSocket(
-    #         name=name,
-    #         uid=uid,
-    #         index=index,
-    #         nodeID=nodeId,
-    #         type=type,
-    #         multiConnection=multiConnection,
-    #     )
+    def Deserialize(cls, pNode: INode, name: str, uid: str, type: int, multiConnect: bool):
+        return JBaseSocket(pNode=pNode, name=name, uid=uid, type=type, multiConnect=multiConnect)

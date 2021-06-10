@@ -1,4 +1,4 @@
-from jigls.jeditor.jdantic import JEdgeModel, JGrNodeModel, JModel
+from jigls.jeditor.jdantic import JGrEdgeModel, JGrNodeModel, JModel
 from jigls.jeditor.base.nodebase import JBaseNode
 from jigls.jeditor.core.graphicscene import JGraphicScene
 from jigls.jeditor.ui.graphicsocket import JGraphicsSocket
@@ -21,7 +21,7 @@ class JDataStreamer(QtCore.QDataStream):
     def Serialize(self, selected: bool = False) -> JModel:
 
         nodes: List[JGrNodeModel] = []
-        edges: List[JEdgeModel] = []
+        edges: List[JGrEdgeModel] = []
 
         if not selected:
             logger.info("serializing all graphics items")
@@ -50,9 +50,7 @@ class JDataStreamer(QtCore.QDataStream):
 
         return JModel(nodes=nodes, edges=edges)
 
-    def Deserialize(
-        self, data: JModel
-    ) -> Generator[Union[JGraphicsNode, JGraphicsEdge], None, None]:
+    def Deserialize(self, data: JModel) -> Generator[Union[JGraphicsNode, JGraphicsEdge], None, None]:
 
         logger.info("deserializing")
 
@@ -72,24 +70,20 @@ class JDataStreamer(QtCore.QDataStream):
                 )
             ):
                 assert isinstance(socket, JGraphicsSocket)
-                if socket.uid() == edge.startSocket.hex:
+                if socket.uid() == edge.startSocket:
                     startSocket = socket
-                elif socket.uid() == edge.destnSocket.hex:
+                elif socket.uid() == edge.destnSocket:
                     destnSocket = socket
 
             if startSocket is None:
-                logger.error(
-                    f"for E:{edge.uid} startSocket:{edge.startSocket} not found"
-                )
+                logger.error(f"for E:{edge.uid} startSocket:{edge.startSocket} not found")
                 continue
             if destnSocket is None:
-                logger.error(
-                    f"for E:{edge.uid} startSocket:{edge.destnSocket} not found"
-                )
+                logger.error(f"for E:{edge.uid} startSocket:{edge.destnSocket} not found")
                 continue
 
             instanceEdge = JGraphicsEdge.Deserialize(
-                uid=edge.uid.hex, startSocket=startSocket, destnSocket=destnSocket
+                uid=edge.uid, startSocket=startSocket, destnSocket=destnSocket, pathType=edge.pathType
             )
             if instanceEdge is None:
                 logger.warning(f"unable to deserialize edge {edge.uid}")

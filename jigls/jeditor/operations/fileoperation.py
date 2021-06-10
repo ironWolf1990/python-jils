@@ -29,7 +29,12 @@ class JFileManager(QtCore.QObject):
 
         logger.info(f"saving to file {fileName}")
 
-        json.dump(obj=data.json(), fp=file)
+        # ! maybe can fix this
+        # json.dump(obj=data.json(), fp=file)
+        # file.close()
+
+        # ? writting json string to file
+        file.write(data.json())
         file.close()
 
     def LoadFromFile(self, fileName: str) -> JModel:
@@ -40,4 +45,4 @@ class JFileManager(QtCore.QObject):
 
         logger.info(f"loading from file {fileName}")
         with open(fileName, "r") as file:
-            return JModel.parse_raw(json.load(file))
+            return JModel.parse_obj(json.load(file))

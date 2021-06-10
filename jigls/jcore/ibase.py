@@ -344,4 +344,4 @@ class ISocket(JAbstractBase):
         return self._data
 
     def __repr__(self) -> str:
-        return f"{super().__repr__()} name:{self._name} type:{self._type} dataType:{self._dataType} data {self._data} execControl:{self._exec} execOnChange:{self._execOnChange} execOnConnect:{self._execOnConnect} dirty:{self._dirty} connections:{len(self._connections)}"
+        return f"{super().__repr__()} pName:{self._pNode.name} type:{self._type} dataType:{self._dataType} data {self._data} execControl:{self._exec} execOnChange:{self._execOnChange} execOnConnect:{self._execOnConnect} dirty:{self._dirty} connections:{len(self._connections)}"

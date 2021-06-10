@@ -1,6 +1,5 @@
 from __future__ import annotations
-from jigls.jcore.ibase import ISocket
-from jigls.jeditor.jdantic import JEdgeModel
+from jigls.jeditor.jdantic import JGrEdgeModel
 
 import logging
 import uuid
@@ -143,7 +142,7 @@ class JGraphicsEdge(QGraphicsPathItem):
         self._destnSocket.Disconnect(self._startSocket.baseSocket)
         self._startSocket.Disconnect(self._destnSocket.baseSocket)
 
-    def ReconnectToSockets(self):
+    def ConnectToSockets(self):
         self.DisconnectFromSockets()
         """to help assist with undostack when re-inserting edge"""
         self._destnSocket.Connect(self._startSocket.baseSocket)
@@ -168,10 +167,11 @@ class JGraphicsEdge(QGraphicsPathItem):
         )
 
     def Serialize(self):
-        return JEdgeModel(
+        return JGrEdgeModel(
             uid=self.uid(),
             startSocket=self.startSocket.uid(),
             destnSocket=self.destnSocket.uid(),
+            pathType=self.pathType,
         )
 
     @classmethod
@@ -180,6 +180,7 @@ class JGraphicsEdge(QGraphicsPathItem):
         uid: str,
         startSocket: JGraphicsSocket,
         destnSocket: JGraphicsSocket,
+        pathType=JCONSTANTS.GREDGE.PATH_BEZIER,
     ) -> Optional[JGraphicsEdge]:
 
         if startSocket.AtMaxLimit():
@@ -189,24 +190,16 @@ class JGraphicsEdge(QGraphicsPathItem):
             logger.error("error deserializing edge, destination socket at max limit")
             return None
 
-        edge = JGraphicsEdge(
-            uid=uid,
-            startSocket=startSocket,
-            destnSocket=destnSocket,
-            pathType=JCONSTANTS.GREDGE.PATH_BEZIER,
-        )
+        edge = JGraphicsEdge(uid=uid, startSocket=startSocket, destnSocket=destnSocket, pathType=pathType)
 
-        edge.ReconnectToSockets()
+        edge.ConnectToSockets()
         return edge
 
     @classmethod
     def DragNewEdge(cls, startSocket: JGraphicsSocket, dragPos: QtCore.QPointF) -> JGraphicsEdge:
         edgeId = uuid.uuid4().hex
         instanceEdge = JGraphicsEdge(
-            uid=edgeId,
-            startSocket=startSocket,
-            destnSocket=None,
-            pathType=JCONSTANTS.GREDGE.PATH_BEZIER,
+            uid=edgeId, startSocket=startSocket, destnSocket=None, pathType=JCONSTANTS.GREDGE.PATH_BEZIER
         )
         instanceEdge.dragPos = dragPos
         return instanceEdge

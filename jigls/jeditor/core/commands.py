@@ -76,7 +76,7 @@ class JEdgeAddCommand(QtWidgets.QUndoCommand):
 
     def redo(self) -> None:
         logger.debug("EdgeAddCommand")
-        self._edge.ReconnectToSockets()
+        self._edge.ConnectToSockets()
         self._graphicScene.addItem(self._edge)
 
 
@@ -89,7 +89,7 @@ class JEdgeRemoveCommand(QtWidgets.QUndoCommand):
 
     def undo(self) -> None:
         logger.debug("EdgeRemoveCommand")
-        self._edge.ReconnectToSockets()
+        self._edge.ConnectToSockets()
         self._graphicScene.addItem(self._edge)
 
     def redo(self) -> None:
@@ -118,7 +118,7 @@ class JEdgeRerouteCommand(QtWidgets.QUndoCommand):
         assert self._oDestinationSocket is not None
         self._edge.destnSocket = self._oDestinationSocket
 
-        self._edge.ReconnectToSockets()
+        self._edge.ConnectToSockets()
         self._edge.update()
 
     def redo(self) -> None:
@@ -127,5 +127,5 @@ class JEdgeRerouteCommand(QtWidgets.QUndoCommand):
         assert self._nDestinationSocket is not None
         self._edge.destnSocket = self._nDestinationSocket
 
-        self._edge.ReconnectToSockets()
+        self._edge.ConnectToSockets()
         self._edge.update()
