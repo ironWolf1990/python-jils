@@ -342,9 +342,8 @@ class JGraphicView(QtWidgets.QGraphicsView):
             return
 
         rect = self._sceneManager.FocusSelection()
-        self.fitInView(rect, QtCore.Qt.KeepAspectRatio)
 
-        # ! zoom gets fuked after fit selection to view in clampled mode
-        # # * reset zoom
-        # if JCONSTANTS.GRVIEW.ZOOM_CLAMPED:
-        #     self._ResetZoom(rect.center())
+        if JCONSTANTS.GRVIEW.ZOOM_CLAMPED:
+            self.centerOn(rect.center())
+        else:
+            self.fitInView(rect, QtCore.Qt.KeepAspectRatio)

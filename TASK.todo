@@ -23,7 +23,7 @@
     ✔ fix broken serialization and deserialization @done(10-06-2021 12:57)
 
   bug:
-    ☐ after focus selected item in view, zoomMin, zoomMax and zoomFactor go out of proportions. @low 
+    ✔ after focus selected item in view, zoomMin, zoomMax and zoomFactor go out of proportions. @low @done(14-06-2021 10:52) : when clamped m centreOn group else fitInView
 
 
 09-05-2021:

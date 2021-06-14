@@ -32,7 +32,7 @@ class JCONSTANTS:
         VERT_SCROLLBAR: int = 1
         HORZ_SCROLLBAR: int = 1
         ZOOM_IN_FACTOR: float = 1.25
-        ZOOM_CLAMPED: bool = False
+        ZOOM_CLAMPED: bool = True
         ZOOM: int = 10
         ZOOM_STEP: int = 1
         ZOOM_RANGE_MIN: int = 0
