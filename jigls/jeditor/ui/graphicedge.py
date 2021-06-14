@@ -1,9 +1,9 @@
 from __future__ import annotations
+from jigls.jeditor.base.socketbase import JBaseSocket
 from jigls.jeditor.jdantic import JGrEdgeModel
 
 import logging
 import uuid
-from collections import OrderedDict
 from typing import TYPE_CHECKING, Optional
 
 from jigls.jeditor.constants import JCONSTANTS

@@ -80,7 +80,7 @@ class INode(JAbstractBase):
         sockets = set([socket.name for socket in self._socketList])
         if not inputs.issubset(sockets):
             logger.error(
-                f"for operation with name {op.name}, node {self.name} does not provide all inputs, missing {inputs.difference(sockets)}"
+                f"for operation with name {op.name}, node {self.name} does not provide all inputs / missing {inputs.difference(sockets)}"
             )
             return
 
@@ -208,7 +208,7 @@ class ISocket(JAbstractBase):
         self._dirty = value
 
         for socket in self._connections:
-            # ! this check is no longer needed, should be removed
+            # ? this check is needed
             if self._type == JCONSTANTS.SOCKET.TYPE_INPUT and socket.Type == JCONSTANTS.SOCKET.TYPE_OUTPUT:
                 # * this is done, so that propagation doesnt go in reverse direction
                 continue
@@ -254,14 +254,13 @@ class ISocket(JAbstractBase):
             self._Connect(dSocket)
 
     def _Connect(self, cSocket: ISocket):
-
         # * input can connect to input (used for gouping nodes)
         # * output can connect to input
         # * output can connect to output (used for data forwarding)
         if self.Type == JCONSTANTS.SOCKET.TYPE_INPUT and cSocket.Type == JCONSTANTS.SOCKET.TYPE_OUTPUT:
             if self._traceback:
                 logger.warning(
-                    f"node:{self.pNode.name} sock:{self.name} connect to node:{cSocket.pNode.name} sock:{cSocket.name}, input connect to output. Set() and Dirty() will not be called for this connection"
+                    f"node:{self.pNode.name} sock:{self.name} connect to node:{cSocket.pNode.name} sock:{cSocket.name}[input connect to output], Set() and Dirty() will not be called for this connection"
                 )
 
         if cSocket.dataType() != self.dataType():
@@ -305,7 +304,6 @@ class ISocket(JAbstractBase):
             self._pNode._Compute()
 
     def Set(self, value):
-
         if not self.exec:
             if self.traceback:
                 logger.debug(f"node:{self._pNode.name} sock:{self._name} is not executable")
@@ -331,7 +329,7 @@ class ISocket(JAbstractBase):
         self._data = value
 
         for socket in self._connections:
-            # ! this check is no longer needed, should be removed
+            # ? this check is needed
             if self._type == JCONSTANTS.SOCKET.TYPE_INPUT and socket.Type == JCONSTANTS.SOCKET.TYPE_OUTPUT:
                 # * this is done, so that propagation doesnt go in reverse direction
                 continue
@@ -344,4 +342,6 @@ class ISocket(JAbstractBase):
         return self._data
 
     def __repr__(self) -> str:
-        return f"{super().__repr__()} pName:{self._pNode.name} type:{self._type} dataType:{self._dataType} data {self._data} execControl:{self._exec} execOnChange:{self._execOnChange} execOnConnect:{self._execOnConnect} dirty:{self._dirty} connections:{len(self._connections)}"
+        return (
+            f"pName:{self._pNode.name} {super().__repr__()}"
+        )  # type:{self._type} dataType:{self._dataType} data {self._data} execControl:{self._exec} execOnChange:{self._execOnChange} execOnConnect:{self._execOnConnect} dirty:{self._dirty} connections:{len(self._connections)}"

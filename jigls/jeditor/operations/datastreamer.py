@@ -37,12 +37,13 @@ class JDataStreamer(QtCore.QDataStream):
                         edges.append(item.Serialize())
         else:
             logger.info("serializing selected graphics items")
+            selectedItems = self._graphicsScene.selectedItems()
 
-            if len(self._graphicsScene.selectedItems()) == 0:
+            if len(selectedItems) == 0:
                 logger.warning("empty scene, nothing to copy")
 
             else:
-                for item in self._graphicsScene.selectedItems():
+                for item in selectedItems:
                     if isinstance(item, JGraphicsNode):
                         nodes.append(item.Serialize())
                     if isinstance(item, JGraphicsEdge):

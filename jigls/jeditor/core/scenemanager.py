@@ -1,17 +1,21 @@
-from jigls.jeditor.operations.fileoperation import JFileManager
 import json
 import logging
 import typing
 from typing import Dict, List, Optional, Tuple
 
-from jigls.logger import logger
+from jigls.jeditor.constants import JCONSTANTS
 from jigls.jeditor.operations.clipboardoperation import JClipboard
 from jigls.jeditor.operations.datastreamer import JDataStreamer
 from jigls.jeditor.operations.edgeoperation import JEdgeDragging, JEdgeRerouting
+from jigls.jeditor.operations.fileoperation import JFileManager
 from jigls.jeditor.operations.nodefactory import JNodeFactory
+from jigls.jeditor.ui.graphicedge import JGraphicsEdge
+from jigls.jeditor.ui.graphicnode import JGraphicsNode
+from jigls.jeditor.ui.graphicsocket import JGraphicsSocket
+from jigls.logger import logger
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import QPointF
-from PyQt5.QtWidgets import QUndoStack
+from PyQt5.QtCore import QPointF, QRect, QRectF, QRegExp, Qt
+from PyQt5.QtWidgets import QGraphicsItem, QUndoStack
 
 from .commands import (
     JEdgeAddCommand,
@@ -20,11 +24,7 @@ from .commands import (
     JNodeAddCommand,
     JNodeRemoveCommand,
 )
-from jigls.jeditor.constants import JCONSTANTS
-from jigls.jeditor.ui.graphicedge import JGraphicsEdge
-from jigls.jeditor.ui.graphicnode import JGraphicsNode
 from .graphicscene import JGraphicScene
-from jigls.jeditor.ui.graphicsocket import JGraphicsSocket
 
 logger = logging.getLogger(__name__)
 
@@ -279,3 +279,25 @@ class JSceneManager(QtCore.QObject):
                 self._undoStack.endMacro()
 
         self._undoStack.endMacro()
+
+    def FocusSelection(self, selected: bool = True) -> QRectF:
+
+        items = self._graphicsScene.selectedItems()
+
+        if len(items) == 0:
+            logger.debug("fit to view")
+            group = self._graphicsScene.createItemGroup(
+                list(filter(lambda item: isinstance(item, JGraphicsNode), self._graphicsScene.items()))
+            )
+            rect = group.boundingRect()
+            self._graphicsScene.destroyItemGroup(group)
+            return rect
+
+        else:
+            logger.debug("focus selected items")
+            group = self._graphicsScene.createItemGroup(
+                list(filter(lambda item: isinstance(item, JGraphicsNode), items))
+            )
+            rect = group.boundingRect()
+            self._graphicsScene.destroyItemGroup(group)
+            return rect

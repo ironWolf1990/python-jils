@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
 )
 
 
-class StartUp(QDialog):
+class JSplashScreen(QDialog):
 
     finish = QtCore.pyqtSignal(bool)
 

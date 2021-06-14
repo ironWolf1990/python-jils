@@ -1,4 +1,4 @@
-from jigls.jeditor.popup.splashscreen import StartUp
+from jigls.jeditor.popup.splashscreen import JSplashScreen
 from jigls.jeditor.editormenu import JMenuBar
 from jigls.jeditor.constants import JCONSTANTS
 from jigls.jeditor.core.editorwidget import JEditorWidget
@@ -82,7 +82,7 @@ class JEditorWindow(QMainWindow):
 
     def show(self) -> None:
         if JCONSTANTS.EDITOR.SPLASH:
-            splash = StartUp(parent=self, flags=QtCore.Qt.WindowStaysOnTopHint)
+            splash = JSplashScreen(parent=self, flags=QtCore.Qt.WindowStaysOnTopHint)
             splash.finished.connect(self._show)
             splash.show()
         else:

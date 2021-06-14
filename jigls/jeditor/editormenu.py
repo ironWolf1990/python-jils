@@ -1,10 +1,11 @@
+from jigls.jeditor.popup.filedialog import JFileDialog
 from jigls.jeditor.core.graphicview import JGraphicView
 import logging
 from functools import partial
 from typing import Callable, Optional
 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QAction
+from PyQt5.QtWidgets import QAction, QDialog
 
 from jigls.jeditor.core.editorwidget import JEditorWidget
 from jigls.jeditor.core.scenemanager import JSceneManager
@@ -296,9 +297,7 @@ class JMenuBar(QtWidgets.QMenuBar):
                 "Sc&ene Information",
                 shortcut="Ctrl+Shift+D",
                 tooltip="jeditor dump debug log",
-                callback=partial(
-                    DebugSceneInformation, self._editorWidget.sceneManager
-                ),
+                callback=partial(DebugSceneInformation, self._editorWidget.sceneManager),
             )
         )
         helpMenu.addSeparator()
@@ -317,25 +316,27 @@ def New(sceneManager: JSceneManager):
 
 
 def Open(sceneManager: JSceneManager):
-    logger.debug("load")
-    sceneManager.LoadFromFile()
+    logger.debug("open")
+    JFileDialog.GetOpenFileName(QDialog())
+    # sceneManager.LoadFromFile()
 
 
 def Close(sceneManager: JSceneManager):
     logger.debug("close")
 
 
-def Exit(sceneManager: JSceneManager):
-    logger.debug("exit")
-
-
 def Save(sceneManager: JSceneManager):
     logger.debug("save")
-    sceneManager.SaveToFile()
+    JFileDialog.GetSaveFileName(QDialog())
+    # sceneManager.SaveToFile()
 
 
 def SaveAs(sceneManager: JSceneManager):
     logger.debug("save as")
+
+
+def Exit(sceneManager: JSceneManager):
+    logger.debug("exit")
 
 
 def Delete(sceneManager: JSceneManager):

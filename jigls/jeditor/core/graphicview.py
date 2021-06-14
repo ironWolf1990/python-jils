@@ -1,14 +1,13 @@
-from jigls.jeditor.widgets.contentwidget import JProxyWidget
 import logging
 import typing
 
 from jigls.jeditor.constants import JCONSTANTS
-from jigls.jeditor.ui.graphicedge import JGraphicsEdge
+from jigls.jeditor.core.scenemanager import JSceneManager
 from jigls.jeditor.ui.graphicnode import JGraphicsNode
 from jigls.jeditor.ui.graphicsocket import JGraphicsSocket
-from jigls.jeditor.core.scenemanager import JSceneManager
-from jigls.logger import logger
+from jigls.jeditor.widgets.contentwidget import JProxyWidget
 from jigls.jeditor.widgets.dockwidget import ExDockWidget1, ExDockWidget2
+from jigls.logger import logger
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 logger = logging.getLogger(__name__)
@@ -52,9 +51,7 @@ class JGraphicView(QtWidgets.QGraphicsView):
         self._previousState: typing.Optional[int] = None
 
         # * selection band
-        self._rubberband: QtWidgets.QRubberBand = QtWidgets.QRubberBand(
-            QtWidgets.QRubberBand.Rectangle, self
-        )
+        self._rubberband: QtWidgets.QRubberBand = QtWidgets.QRubberBand(QtWidgets.QRubberBand.Rectangle, self)
         self._rubberBandStart: QtCore.QPoint = QtCore.QPoint()
 
         self.setRenderHints(
@@ -68,12 +65,8 @@ class JGraphicView(QtWidgets.QGraphicsView):
         self.setCacheMode(QtWidgets.QGraphicsView.CacheBackground)
         # self.setOptimizationFlag(QtWidgets.QGraphicsView.DontAdjustForAntialiasing)
         self.setViewportUpdateMode(QtWidgets.QGraphicsView.MinimalViewportUpdate)
-        self.setHorizontalScrollBarPolicy(
-            QtCore.Qt.ScrollBarPolicy(self.scrollbarHorzPolicy)
-        )
-        self.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarPolicy(self.scrollbarVertPolicy)
-        )
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy(self.scrollbarHorzPolicy))
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy(self.scrollbarVertPolicy))
         self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
 
         # * helper
@@ -93,8 +86,7 @@ class JGraphicView(QtWidgets.QGraphicsView):
         elif (
             event.button() == QtCore.Qt.LeftButton
             and event.modifiers() == QtCore.Qt.NoModifier
-            and self.scene().itemAt(self.mapToScene(event.pos()), QtGui.QTransform())
-            is None
+            and self.scene().itemAt(self.mapToScene(event.pos()), QtGui.QTransform()) is None
         ):
             self._currentMode = JCONSTANTS.GRVIEW.MODE_SELECTION
             self._InitRubberband(event.pos())
@@ -109,27 +101,18 @@ class JGraphicView(QtWidgets.QGraphicsView):
                 JGraphicsSocket,
             )
         ):
-            self.StartEdgeDrag(
-                self.scene().itemAt(self.mapToScene(event.pos()), QtGui.QTransform())
-            )
+            self.StartEdgeDrag(self.scene().itemAt(self.mapToScene(event.pos()), QtGui.QTransform()))
 
         # * end edge drag
-        elif (
-            event.button() == QtCore.Qt.LeftButton
-            and self._currentMode == JCONSTANTS.GRVIEW.MODE_EDGE_DRAG
-        ):
-            self.EndEdgeDrag(
-                self.scene().itemAt(self.mapToScene(event.pos()), QtGui.QTransform())
-            )
+        elif event.button() == QtCore.Qt.LeftButton and self._currentMode == JCONSTANTS.GRVIEW.MODE_EDGE_DRAG:
+            self.EndEdgeDrag(self.scene().itemAt(self.mapToScene(event.pos()), QtGui.QTransform()))
 
         # * end edge reroute
         elif (
             event.button() == QtCore.Qt.LeftButton
             and self._currentMode == JCONSTANTS.GRVIEW.MODE_EDGE_REROUTE
         ):
-            self.EndEdgeReRouting(
-                self.scene().itemAt(self.mapToScene(event.pos()), QtGui.QTransform())
-            )
+            self.EndEdgeReRouting(self.scene().itemAt(self.mapToScene(event.pos()), QtGui.QTransform()))
 
         super().mousePressEvent(event)
 
@@ -139,30 +122,20 @@ class JGraphicView(QtWidgets.QGraphicsView):
         if self._currentMode == JCONSTANTS.GRVIEW.MODE_PAN_VIEW:
             offset = self.prevPos - event.pos()  # type:ignore
             self.prevPos = event.pos()
-            self.verticalScrollBar().setValue(
-                self.verticalScrollBar().value() + offset.y()
-            )
-            self.horizontalScrollBar().setValue(
-                self.horizontalScrollBar().value() + offset.x()
-            )
+            self.verticalScrollBar().setValue(self.verticalScrollBar().value() + offset.y())
+            self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() + offset.x())
 
         # * RuberBand selection.
         elif self._currentMode == JCONSTANTS.GRVIEW.MODE_SELECTION:
-            self._rubberband.setGeometry(
-                QtCore.QRect(self._rubberBandOrigin, event.pos()).normalized()
-            )
+            self._rubberband.setGeometry(QtCore.QRect(self._rubberBandOrigin, event.pos()).normalized())
 
         # * Edge drag
         elif self._currentMode == JCONSTANTS.GRVIEW.MODE_EDGE_DRAG:
-            self._sceneManager._edgeDragging.UpdateDragPosition(
-                self.mapToScene(event.pos())
-            )
+            self._sceneManager._edgeDragging.UpdateDragPosition(self.mapToScene(event.pos()))
 
         # * edge rerouting
         elif self._currentMode == JCONSTANTS.GRVIEW.MODE_EDGE_REROUTE:
-            self._sceneManager._edgeReroute.UpdateDragPosition(
-                self.mapToScene(event.pos())
-            )
+            self._sceneManager._edgeReroute.UpdateDragPosition(self.mapToScene(event.pos()))
 
         # * save mouse positon if needed to be used by other methods
         self._mousePosition = self.mapToScene(event.pos())
@@ -181,9 +154,7 @@ class JGraphicView(QtWidgets.QGraphicsView):
 
         # * Selection
         elif self._currentMode == JCONSTANTS.GRVIEW.MODE_SELECTION:
-            self._rubberband.setGeometry(
-                QtCore.QRect(self._rubberBandOrigin, event.pos()).normalized()
-            )
+            self._rubberband.setGeometry(QtCore.QRect(self._rubberBandOrigin, event.pos()).normalized())
             painterPath = self._ReleaseRubberband()
             self.setInteractive(True)
             self.scene().setSelectionArea(painterPath)
@@ -241,31 +212,19 @@ class JGraphicView(QtWidgets.QGraphicsView):
             self._sceneManager.RemoveFromScene()
 
         # * save to file
-        elif (
-            event.key() == QtCore.Qt.Key_S
-            and event.modifiers() == QtCore.Qt.ControlModifier
-        ):
+        elif event.key() == QtCore.Qt.Key_S and event.modifiers() == QtCore.Qt.ControlModifier:
             self._sceneManager.SaveToFile()
 
         # * load from file
-        elif (
-            event.key() == QtCore.Qt.Key_O
-            and event.modifiers() == QtCore.Qt.ControlModifier
-        ):
+        elif event.key() == QtCore.Qt.Key_O and event.modifiers() == QtCore.Qt.ControlModifier:
             self._sceneManager.LoadFromFile()
 
         # * undo
-        elif (
-            event.key() == QtCore.Qt.Key_Z
-            and event.modifiers() == QtCore.Qt.ControlModifier
-        ):
+        elif event.key() == QtCore.Qt.Key_Z and event.modifiers() == QtCore.Qt.ControlModifier:
             self._sceneManager.undoStack.undo()
 
         # * redo
-        elif (
-            event.key() == QtCore.Qt.Key_R
-            and event.modifiers() == QtCore.Qt.ControlModifier
-        ):
+        elif event.key() == QtCore.Qt.Key_R and event.modifiers() == QtCore.Qt.ControlModifier:
             self._sceneManager.undoStack.redo()
 
         # * debug
@@ -274,7 +233,7 @@ class JGraphicView(QtWidgets.QGraphicsView):
         ):
             self._sceneManager.DebugSceneInformation()
 
-        # * debug
+        # * edge reroute
         elif (
             event.key() == QtCore.Qt.Key_E
             and event.modifiers() == QtCore.Qt.ShiftModifier
@@ -306,14 +265,20 @@ class JGraphicView(QtWidgets.QGraphicsView):
         ):
             self.PasteGraphicsItems()
 
+        # * focus elements
+        elif (
+            event.key() == QtCore.Qt.Key_F
+            and event.modifiers() == QtCore.Qt.ShiftModifier
+            and self._currentMode == JCONSTANTS.GRVIEW.MODE_DEFAULT
+        ):
+            self.FocusSelection()
+
         super().keyPressEvent(event)
 
     def _InitRubberband(self, position: QtCore.QPoint):
         self._rubberBandStart = position
         self._rubberBandOrigin = position
-        self._rubberband.setGeometry(
-            QtCore.QRect(self._rubberBandOrigin, QtCore.QSize())
-        )
+        self._rubberband.setGeometry(QtCore.QRect(self._rubberBandOrigin, QtCore.QSize()))
         self._rubberband.show()
 
     def _ReleaseRubberband(self):
@@ -323,6 +288,15 @@ class JGraphicView(QtWidgets.QGraphicsView):
         self._rubberband.hide()
         return painterPath
 
+    def _ResetZoom(self, center: typing.Optional[QtCore.QPointF] = None):
+        sceneRange = QtCore.QRectF(0, 0, self.size().width(), self.size().height())
+        if center:
+            sceneRange.translate(center.x() - sceneRange.center().x(), center.y() - sceneRange.center().y())
+        self.setSceneRect(sceneRange)
+        self.fitInView(sceneRange)
+        # self._zoom = self._zoomRangeMax
+
+    # ? OPERATIONS
     def StartEdgeDrag(self, item: QtWidgets.QGraphicsItem):
         assert isinstance(item, JGraphicsSocket)
         if self._sceneManager.StartEdgeDrag(item):
@@ -346,24 +320,31 @@ class JGraphicView(QtWidgets.QGraphicsView):
 
     def CopyGraphicsItems(self):
         if self._currentMode != JCONSTANTS.GRVIEW.MODE_DEFAULT:
-            logger.error(
-                f"can only perform copy action in MODE_DEFAULT, current mode {self._currentMode}"
-            )
+            logger.error(f"can only perform copy action in MODE_DEFAULT, current mode {self._currentMode}")
             return
         self._sceneManager.CopyItems()
 
     def CutGraphicsItems(self):
         if self._currentMode != JCONSTANTS.GRVIEW.MODE_DEFAULT:
-            logger.error(
-                f"can only perform cut action in MODE_DEFAULT, current mode {self._currentMode}"
-            )
+            logger.error(f"can only perform cut action in MODE_DEFAULT, current mode {self._currentMode}")
             return
         self._sceneManager.CutItems()
 
     def PasteGraphicsItems(self):
         if self._currentMode != JCONSTANTS.GRVIEW.MODE_DEFAULT:
-            logger.error(
-                f"can only perform paste action in MODE_DEFAULT, current mode {self._currentMode}"
-            )
+            logger.error(f"can only perform paste action in MODE_DEFAULT, current mode {self._currentMode}")
             return
         self._sceneManager.PasteItems(self._mousePosition)
+
+    def FocusSelection(self):
+        if self._currentMode != JCONSTANTS.GRVIEW.MODE_DEFAULT:
+            logger.error(f"can only perform paste action in MODE_DEFAULT, current mode {self._currentMode}")
+            return
+
+        rect = self._sceneManager.FocusSelection()
+        self.fitInView(rect, QtCore.Qt.KeepAspectRatio)
+
+        # ! zoom gets fuked after fit selection to view in clampled mode
+        # # * reset zoom
+        # if JCONSTANTS.GRVIEW.ZOOM_CLAMPED:
+        #     self._ResetZoom(rect.center())

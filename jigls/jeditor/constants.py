@@ -1,3 +1,6 @@
+from logging import fatal
+
+
 class JCONSTANTS:
     class EDITOR:
         WIDTH: int = 1280
@@ -5,8 +8,12 @@ class JCONSTANTS:
         TITLE: str = "J-Editor"
         SPLASH: bool = False
         SPLASH_IMAGE: str = r"resources/splash.png"
-        SPLASH_TIME: int = 1700
-        START_CENTER_ON_MOUSE = False
+        SPLASH_TIME: int = 1300
+        START_CENTER_ON_MOUSE: bool = False
+
+    class MODEL:
+        DEFAULT_SAVE_PATH: str = r"models/"
+        EXTENSION: str = "jigls"
 
     class GRSCENE:
         BACKGROUND_COLOR: str = "#393939"
@@ -25,7 +32,7 @@ class JCONSTANTS:
         VERT_SCROLLBAR: int = 1
         HORZ_SCROLLBAR: int = 1
         ZOOM_IN_FACTOR: float = 1.25
-        ZOOM_CLAMPED: bool = True
+        ZOOM_CLAMPED: bool = False
         ZOOM: int = 10
         ZOOM_STEP: int = 1
         ZOOM_RANGE_MIN: int = 0

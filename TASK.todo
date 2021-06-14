@@ -1,12 +1,13 @@
 
 25-05-2021:
   tasks:
-    ✔ implement compute node @done(05-06-2021 14:05)
+    ✔ implement compute operations @done(05-06-2021 14:05)
     ☐ imlpement content node
     ✔ use pydantic for data serialization @started(30-05-2021 15:57) @done(30-05-2021 22:38) @lasted(6h41m31s)
     ☐ implement property widget
     ☐ implement file operations
     ✔ implement simple dock @done(30-05-2021 22:38)
+    ✔ implement zooming into selected nodes in view (focus selected nodes) @done(14-06-2021 01:14)
 
   feature:
     ✔ implement autonode @done(09-06-2021 17:20)
@@ -19,7 +20,10 @@
     ✔ rework edge, scene manager and edge operations @done(09-06-2021 17:22)
     ✔ inputs can connect to output socket, but Set and Dirty is not called to avoid back prop and inifinit loop @done(09-06-2021 17:22)
     ✔ fix attached edge was not getting deleted when node was getting deleted @done(09-06-2021 21:11)
-    ☐ fix broken serialization and deserialization
+    ✔ fix broken serialization and deserialization @done(10-06-2021 12:57)
+
+  bug:
+    ☐ after focus selected item in view, zoomMin, zoomMax and zoomFactor go out of proportions. @low 
 
 
 09-05-2021:
