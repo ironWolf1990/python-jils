@@ -5,12 +5,12 @@ from jigls.jeditor.ui.graphicnode import JGraphicsNode
 from jigls.jeditor.ui.graphicsocket import JGraphicsSocket
 from jigls.logger import logger
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QGraphicsScene
+from PyQt5.QtWidgets import QGraphicsScene, QUndoCommand
 
 logger = logging.getLogger(__name__)
 
 
-class JNodeAddCommand(QtWidgets.QUndoCommand):
+class JNodeAddCommand(QUndoCommand):
     def __init__(self, graphicScene: QGraphicsScene, node: JGraphicsNode) -> None:
         super().__init__()
         self._graphicScene: QGraphicsScene = graphicScene
@@ -26,7 +26,7 @@ class JNodeAddCommand(QtWidgets.QUndoCommand):
         self._graphicScene.addItem(self._node)
 
 
-class JNodeRemoveCommand(QtWidgets.QUndoCommand):
+class JNodeRemoveCommand(QUndoCommand):
     def __init__(self, graphicScene: QGraphicsScene, node: JGraphicsNode) -> None:
         super().__init__()
         self._graphicScene: QGraphicsScene = graphicScene
@@ -42,7 +42,7 @@ class JNodeRemoveCommand(QtWidgets.QUndoCommand):
         self._graphicScene.removeItem(self._node)
 
 
-class JNodeMoveCommand(QtWidgets.QUndoCommand):
+class JNodeMoveCommand(QUndoCommand):
     ...
     # def __init__(self, graphicScene: QGraphicsScene, node: JGraphicNode) -> None:
     #     super().__init__()
@@ -57,7 +57,7 @@ class JNodeMoveCommand(QtWidgets.QUndoCommand):
     #     self._graphicScene.removeItem(self._node)
 
 
-class JEdgeAddCommand(QtWidgets.QUndoCommand):
+class JEdgeAddCommand(QUndoCommand):
     def __init__(
         self,
         graphicScene: QGraphicsScene,
@@ -80,7 +80,7 @@ class JEdgeAddCommand(QtWidgets.QUndoCommand):
         self._graphicScene.addItem(self._edge)
 
 
-class JEdgeRemoveCommand(QtWidgets.QUndoCommand):
+class JEdgeRemoveCommand(QUndoCommand):
     def __init__(self, graphicScene: QGraphicsScene, edge: JGraphicsEdge) -> None:
         super().__init__()
         self._graphicScene: QGraphicsScene = graphicScene
@@ -98,7 +98,7 @@ class JEdgeRemoveCommand(QtWidgets.QUndoCommand):
         self._graphicScene.removeItem(self._edge)
 
 
-class JEdgeRerouteCommand(QtWidgets.QUndoCommand):
+class JEdgeRerouteCommand(QUndoCommand):
     def __init__(
         self,
         graphicScene: QGraphicsScene,

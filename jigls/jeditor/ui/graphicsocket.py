@@ -72,6 +72,9 @@ class JGraphicsSocket(QGraphicsItem):
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setAcceptHoverEvents(True)
 
+        # ! high cpu usage bug fix sollution
+        self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
+
         self._penOutline = QtGui.QPen(QtGui.QColor(JCONSTANTS.GRSOCKET.COLOR_OUTLINE))
         self._penOutline.setWidthF(JCONSTANTS.GRSOCKET.WIDTH_OUTLINE)
 

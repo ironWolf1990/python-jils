@@ -86,6 +86,9 @@ class JGraphicsNode(QGraphicsItem):
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsFocusable, True)
 
+        # ! high cpu usage bug fix sollution
+        self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
+
         # * title
         titleFont: QtGui.QFont = QtGui.QFont(JCONSTANTS.GRNODE.TITLE_FONT, JCONSTANTS.GRNODE.TITLE_FONT_SIZE)
         titleFont.setItalic(True)

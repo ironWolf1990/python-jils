@@ -17,17 +17,21 @@ class JFileManager(QtCore.QObject):
     def __init__(self, parent: Optional[QtCore.QObject] = None) -> None:
         super().__init__(parent=parent)
 
-    def SaveToFile(self, data: JModel, fileName: str):
-        file = None
-        if not os.path.exists(fileName):
-            file = open(fileName, "x")
+    def SaveFile(self, data: JModel, filename: str):
 
-        assert os.path.exists(fileName), logger.error(f"{fileName} not found")
-        file = open(fileName, "w")
+        file = None
+
+        if not os.path.exists(filename):
+            logger.info(f"creating new file {filename}")
+            file = open(filename, "x")
+
+        assert os.path.exists(filename), logger.error(f"{filename} not found")
+
+        file = open(filename, "w")
 
         assert file, logger.error(f"file object is None")
 
-        logger.info(f"saving to file {fileName}")
+        logger.info(f"saving to file {filename}")
 
         # ! maybe can fix this
         # json.dump(obj=data.json(), fp=file)
@@ -37,12 +41,12 @@ class JFileManager(QtCore.QObject):
         file.write(data.json())
         file.close()
 
-    def LoadFromFile(self, fileName: str) -> JModel:
+    def OpenFile(self, filename: str) -> JModel:
 
-        if not os.path.exists(fileName):
-            logger.error(f"{fileName} not found")
+        if not os.path.exists(filename):
+            logger.error(f"{filename} not found")
             raise FileNotFoundError
 
-        logger.info(f"loading from file {fileName}")
-        with open(fileName, "r") as file:
+        logger.info(f"loading from file {filename}")
+        with open(filename, "r") as file:
             return JModel.parse_obj(json.load(file))

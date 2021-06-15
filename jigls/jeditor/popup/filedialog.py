@@ -10,10 +10,10 @@ class JFileDialog:
             parent,
             "J-Editor: save model file",
             ".",
-            f"Jigls Model (*.{JCONSTANTS.MODEL.EXTENSION})",
+            f"Jigls Model (*.{JCONSTANTS.MODEL.FILE_EXTENSION})",
             options=QFileDialog.DontUseNativeDialog,
         )
-        return fileName if fileName else None
+        return ".".join((fileName, JCONSTANTS.MODEL.FILE_EXTENSION)) if fileName else None
 
     @staticmethod
     def GetOpenFileName(parent=None) -> Optional[str]:
@@ -21,7 +21,7 @@ class JFileDialog:
             parent,
             "J-Editor: open model file",
             f"./{JCONSTANTS.MODEL.DEFAULT_SAVE_PATH}",
-            f"Jigls Model (*.{JCONSTANTS.MODEL.EXTENSION})",
+            f"Jigls Model (*.{JCONSTANTS.MODEL.FILE_EXTENSION})",
             options=QFileDialog.DontUseNativeDialog,
         )
         return fileName if fileName else None

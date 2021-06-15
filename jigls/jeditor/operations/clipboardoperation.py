@@ -10,7 +10,6 @@ from jigls.logger import logger
 from PyQt5.QtCore import QObject, QPointF
 
 logger = logging.getLogger(__name__)
-from pprint import pprint
 
 
 class JClipboard(QObject):

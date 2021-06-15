@@ -8,22 +8,53 @@ from PyQt5.QtWidgets import (
     QTableView,
     QHeaderView,
     QVBoxLayout,
+    QWidget,
 )
 from PyQt5.QtCore import QModelIndex, Qt, QSortFilterProxyModel
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from typing import Optional
+
+name = (
+    "Apple",
+    "Facebook",
+    "Google",
+    "Amazon",
+    "Walmart",
+    "Dropbox",
+    "Starbucks",
+    "eBay",
+    "Canon",
+    "Apple",
+    "Facebook",
+    "Google",
+    "Amazon",
+    "Walmart",
+    "Dropbox",
+    "Starbucks",
+    "eBay",
+    "Canon",
+)
+
+uid: List[str] = ["a", "b", "c", "s", "v", "y", "z", "t", "p", "a", "b", "c", "s", "v", "y", "z", "t", "p"]
 
 
 class JSearchBox(QDialog):
 
     nodeUID = QtCore.pyqtSignal(str)  # return uid
 
-    def __init__(self, columns: List[str]):
-        super().__init__()
+    def __init__(self, parent: Optional[QWidget], columns: List[str]):
+        super().__init__(parent=parent)
+
+        self.setWindowTitle("J-Search")
         self.resize(650, 500)
-        self.columns: List[str] = columns
         # self.setFixedWidth(500)
+
+        self.columns: List[str] = columns
+
         self.setLayout(QVBoxLayout(self))
+
         self.initUI()
+        # self.initContent()
 
     def initUI(self):
 
@@ -64,10 +95,10 @@ class JSearchBox(QDialog):
         # * trigger
 
         self.searchInput.textChanged.connect(self.filterModel.setFilterRegExp)
-        self.searchFields.currentTextChanged.connect(self._FieldChange)
+        self.searchFields.currentTextChanged.connect(self.__FieldChange)
         self.table.clicked[QtCore.QModelIndex].connect(self.Search)  # type:ignore
 
-    def _FieldChange(self, a0: str):
+    def __FieldChange(self, a0: str):
         self.filterModel.setFilterKeyColumn(self.columns.index(a0))
 
     def AddItems(self, row: int, name: str, uid: str, type: str = "BaseType"):
@@ -84,15 +115,28 @@ class JSearchBox(QDialog):
         self.filterModel.sourceModel().setItem(row, 1, uidItem)
         self.filterModel.sourceModel().setItem(row, 2, typeItem)
 
+    def initContent(self):
+        for idx in range(len(name)):
+            self.AddItems(idx, name[idx], uid[idx])
+
     def Search(self, index: QModelIndex):
 
-        # *
         sib1 = index.siblingAtRow(index.row()).siblingAtColumn(0)
         sib2 = index.siblingAtRow(index.row()).siblingAtColumn(1)
         sib3 = index.siblingAtRow(index.row()).siblingAtColumn(2)
 
-        print(
-            self.filterModel.itemData(sib1)[0],
+        self.nodeUID.emit(  # type:ignore
             self.filterModel.itemData(sib2)[0],
-            self.filterModel.itemData(sib3)[0],
         )
+
+        # print(
+        #     self.filterModel.itemData(sib1)[0],
+        #     self.filterModel.itemData(sib2)[0],
+        #     self.filterModel.itemData(sib3)[0],
+        # )
+
+        # print(
+        #     self.filterModel.itemData(sib1),
+        #     self.filterModel.itemData(sib2),
+        #     self.filterModel.itemData(sib3),
+        # )

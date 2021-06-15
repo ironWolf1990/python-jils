@@ -13,7 +13,7 @@ class JCONSTANTS:
 
     class MODEL:
         DEFAULT_SAVE_PATH: str = r"models/"
-        EXTENSION: str = "jigls"
+        FILE_EXTENSION: str = "jigls"
 
     class GRSCENE:
         BACKGROUND_COLOR: str = "#393939"

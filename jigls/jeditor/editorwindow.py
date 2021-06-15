@@ -5,6 +5,7 @@ from jigls.jeditor.core.editorwidget import JEditorWidget
 import typing
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import (
+    QApplication,
     QDesktopWidget,
     QDialog,
     QDockWidget,
@@ -26,7 +27,7 @@ class JStatusBar(QStatusBar):
 class JEditorWindow(QMainWindow):
     def __init__(
         self,
-        parent: typing.Optional[QtWidgets.QWidget] = None,
+        parent: typing.Optional[QWidget] = None,
     ) -> None:
         super().__init__(parent=parent)
 
@@ -67,12 +68,8 @@ class JEditorWindow(QMainWindow):
 
         if JCONSTANTS.EDITOR.START_CENTER_ON_MOUSE:
             frame.moveCenter(
-                QtWidgets.QApplication.desktop()
-                .screenGeometry(
-                    QtWidgets.QApplication.desktop().screenNumber(
-                        QtWidgets.QApplication.desktop().cursor().pos()
-                    )
-                )
+                QApplication.desktop()
+                .screenGeometry(QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos()))
                 .center()
             )
         else:

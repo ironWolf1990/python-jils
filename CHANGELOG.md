@@ -1,5 +1,25 @@
 # Changelog
 
+
+## [0.7.5] - 2021-06-15
+
+### Added
+
+- implement ibase (inode and isocket)
+- implement compute propagation
+- use pydantic for data serialization
+- implement basic file operations
+- implement zooming into selected nodes in view
+- implement searchbox
+
+### Fixed
+
+- after focus selected item in view, zoomMin, zoomMax and zoomFactor go out of proportions (hen clamped centreOn group else fitInView)
+- high cpu usage (deviceCoordinatedCache mode for graphicsitems)
+- inputs can connect to output socket, but Set and Dirty is not called to avoid back prop and inifinit loop
+- fix attached edge was not getting deleted when node was getting deleted
+- fix broken serialization and deserialization using pydantic
+
 ## [0.6.3] - 2021-05-25
 
 ### Added

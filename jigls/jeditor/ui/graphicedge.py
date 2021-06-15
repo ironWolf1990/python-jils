@@ -1,26 +1,17 @@
 from __future__ import annotations
-from jigls.jeditor.base.socketbase import JBaseSocket
-from jigls.jeditor.jdantic import JGrEdgeModel
 
 import logging
 import uuid
 from typing import TYPE_CHECKING, Optional
 
 from jigls.jeditor.constants import JCONSTANTS
-from jigls.jeditor.core.graphicedgepath import (
-    JGraphicEdgeBezier,
-    JGraphicEdgeDirect,
-    JGraphicEdgeSquare,
-)
-from jigls.logger import logger
+from jigls.jeditor.core.graphicedgepath import JGraphicEdgeBezier, JGraphicEdgeDirect, JGraphicEdgeSquare
+from jigls.jeditor.jdantic import JGrEdgeModel
 from jigls.jeditor.utils import UniqueIdentifier
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import (
-    QGraphicsItem,
-    QGraphicsPathItem,
-    QStyleOptionGraphicsItem,
-    QWidget,
-)
+from jigls.logger import logger
+from PyQt5.QtCore import QPointF, Qt
+from PyQt5.QtGui import QColor, QPainter, QPen
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QStyleOptionGraphicsItem, QWidget
 
 from .graphicsocket import JGraphicsSocket
 
@@ -43,7 +34,7 @@ class JGraphicsEdge(QGraphicsPathItem):
         self._startSocket: JGraphicsSocket = startSocket
         self._destnSocket: Optional[JGraphicsSocket] = destnSocket
         self._pathType: int = pathType
-        self._dragPos: QtCore.QPointF = QtCore.QPointF()
+        self._dragPos: QPointF = QPointF()
 
         self.initUI()
 
@@ -54,21 +45,24 @@ class JGraphicsEdge(QGraphicsPathItem):
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setZValue(-1.0)
 
+        # ! high cpu usage bug fix sollution
+        self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
+
         # pens for diff mode
 
-        self._edgePen = QtGui.QPen(QtGui.QColor(JCONSTANTS.GREDGE.COLOR_DEFAULT))
+        self._edgePen = QPen(QColor(JCONSTANTS.GREDGE.COLOR_DEFAULT))
         self._edgePen.setWidthF(JCONSTANTS.GREDGE.WIDTH)
 
-        self._edgePenSelected = QtGui.QPen(QtGui.QColor(JCONSTANTS.GREDGE.COLOR_SELECTED))
+        self._edgePenSelected = QPen(QColor(JCONSTANTS.GREDGE.COLOR_SELECTED))
         self._edgePenSelected.setWidthF(JCONSTANTS.GREDGE.WIDTH)
 
-        self._edgePenDrag = QtGui.QPen(QtGui.QColor(JCONSTANTS.GREDGE.COLOR_DRAG))
+        self._edgePenDrag = QPen(QColor(JCONSTANTS.GREDGE.COLOR_DRAG))
         self._edgePenDrag.setWidthF(JCONSTANTS.GREDGE.WIDTH)
-        self._edgePenDrag.setStyle(QtCore.Qt.DashLine)
+        self._edgePenDrag.setStyle(Qt.DashLine)
 
     def paint(
         self,
-        painter: QtGui.QPainter,
+        painter: QPainter,
         option: QStyleOptionGraphicsItem,
         widget: Optional[QWidget],
     ) -> None:
@@ -81,7 +75,7 @@ class JGraphicsEdge(QGraphicsPathItem):
             else self._edgePen
         )
 
-        painter.setBrush(QtCore.Qt.NoBrush)
+        painter.setBrush(Qt.NoBrush)
         painter.drawPath(self.path())
 
         self.UpdatePath()
@@ -100,14 +94,14 @@ class JGraphicsEdge(QGraphicsPathItem):
             logger.warning(f"max edge limit reached for socket {socket.uid()}")
             raise UserWarning
         self._destnSocket = socket
-        self._dragPos = QtCore.QPointF()
+        self._dragPos = QPointF()
 
     @property
-    def dragPos(self) -> QtCore.QPointF:
+    def dragPos(self) -> QPointF:
         return self._dragPos
 
     @dragPos.setter
-    def dragPos(self, pos: QtCore.QPointF):
+    def dragPos(self, pos: QPointF):
         self._dragPos = pos
         if self._destnSocket is not None:
             logger.info(f"removed edge from destination socket, edge is repositioning {self.uid()}")
@@ -118,13 +112,13 @@ class JGraphicsEdge(QGraphicsPathItem):
         return self._startSocket.scenePos()
 
     @property
-    def destinationPos(self) -> QtCore.QPointF:
+    def destinationPos(self) -> QPointF:
         if self._destnSocket is not None:
             return self._destnSocket.scenePos()
         return self._dragPos
 
     @property
-    def endPos(self) -> QtCore.QPointF:
+    def endPos(self) -> QPointF:
         return self.destinationPos
 
     @property
@@ -196,7 +190,7 @@ class JGraphicsEdge(QGraphicsPathItem):
         return edge
 
     @classmethod
-    def DragNewEdge(cls, startSocket: JGraphicsSocket, dragPos: QtCore.QPointF) -> JGraphicsEdge:
+    def DragNewEdge(cls, startSocket: JGraphicsSocket, dragPos: QPointF) -> JGraphicsEdge:
         edgeId = uuid.uuid4().hex
         instanceEdge = JGraphicsEdge(
             uid=edgeId, startSocket=startSocket, destnSocket=None, pathType=JCONSTANTS.GREDGE.PATH_BEZIER

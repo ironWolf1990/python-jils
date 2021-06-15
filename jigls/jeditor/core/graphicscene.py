@@ -1,10 +1,12 @@
 from typing import List
 from jigls.jeditor.constants import JCONSTANTS
-from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt5.QtWidgets import QGraphicsScene
+from PyQt5.QtGui import QColor, QPainter, QPen
+from PyQt5.QtCore import QLine, QRectF
 import math
 
 
-class JGraphicScene(QtWidgets.QGraphicsScene):
+class JGraphicScene(QGraphicsScene):
     def __init__(
         self,
         parent=None,
@@ -29,26 +31,26 @@ class JGraphicScene(QtWidgets.QGraphicsScene):
 
     def _InitVariables(self):
 
-        self._colorBackground = QtGui.QColor(JCONSTANTS.GRSCENE.BACKGROUND_COLOR)
-        self._colorMajorLine = QtGui.QColor(JCONSTANTS.GRSCENE.MAJOR_LINE_COLOR)
-        self._colorMinorLine = QtGui.QColor(JCONSTANTS.GRSCENE.MINOR_LINE_COLOR)
+        self._colorBackground = QColor(JCONSTANTS.GRSCENE.BACKGROUND_COLOR)
+        self._colorMajorLine = QColor(JCONSTANTS.GRSCENE.MAJOR_LINE_COLOR)
+        self._colorMinorLine = QColor(JCONSTANTS.GRSCENE.MINOR_LINE_COLOR)
 
         self._widhtMajorLine: int = JCONSTANTS.GRSCENE.MAJOR_LINE_PEN_WIDTH
         self._widhtMinorLine: int = JCONSTANTS.GRSCENE.MINOR_LINE_PEN_WIDTH
-        self._penMajorLine = QtGui.QPen(self._colorMajorLine)
-        self._penMinorLine = QtGui.QPen(self._colorMinorLine)
+        self._penMajorLine = QPen(self._colorMajorLine)
+        self._penMinorLine = QPen(self._colorMinorLine)
 
         self._gridSize: int = JCONSTANTS.GRSCENE.GRID_SIZE
         self._lineSpacing: int = JCONSTANTS.GRSCENE.LINE_SPACING
         self._enableGridLines: bool = JCONSTANTS.GRSCENE.GRID_LINES
 
-    def drawBackground(self, painter: QtGui.QPainter, rect: QtCore.QRectF) -> None:
+    def drawBackground(self, painter: QPainter, rect: QRectF) -> None:
         super().drawBackground(painter, rect)
 
         if self._enableGridLines:
             self._GridLines(painter, rect)
 
-    def _GridLines(self, painter: QtGui.QPainter, rect: QtCore.QRectF):
+    def _GridLines(self, painter: QPainter, rect: QRectF):
         # * grid bounds
         left = int(math.floor(rect.left()))
         right = int(math.ceil(rect.right()))
@@ -60,19 +62,16 @@ class JGraphicScene(QtWidgets.QGraphicsScene):
 
         # * compute lines
         majorLine = [
-            QtCore.QLine(x, top, x, bottom)
-            for x in range(fLeft, right, self._gridSize * self._lineSpacing)
+            QLine(x, top, x, bottom) for x in range(fLeft, right, self._gridSize * self._lineSpacing)
         ]
 
         for y in range(fTop, bottom, self._gridSize * self._lineSpacing):
-            majorLine.append(QtCore.QLine(left, y, right, y))
+            majorLine.append(QLine(left, y, right, y))
 
-        minorLines = [
-            QtCore.QLine(x, top, x, bottom) for x in range(fLeft, right, self._gridSize)
-        ]
+        minorLines = [QLine(x, top, x, bottom) for x in range(fLeft, right, self._gridSize)]
 
         for y in range(fTop, bottom, self._gridSize):
-            minorLines.append(QtCore.QLine(left, y, right, y))
+            minorLines.append(QLine(left, y, right, y))
 
         # * draw lines
         painter.setPen(self._penMajorLine)

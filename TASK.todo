@@ -5,15 +5,16 @@
     ☐ imlpement content node
     ✔ use pydantic for data serialization @started(30-05-2021 15:57) @done(30-05-2021 22:38) @lasted(6h41m31s)
     ☐ implement property widget
-    ☐ implement file operations
+    ✔ implement basic file operations @done(15-06-2021 16:51)
     ✔ implement simple dock @done(30-05-2021 22:38)
     ✔ implement zooming into selected nodes in view (focus selected nodes) @done(14-06-2021 01:14)
+    ✔ implement searchbox @done(15-06-2021 16:35)
 
   feature:
     ✔ implement autonode @done(09-06-2021 17:20)
     ✔ model json schema @done(30-05-2021 22:39)
     ☐ model xml schema @low
-    ☐ implement qgraphicsgroup @low
+    ☐ implement qgraphicsgroup (combining nodes into a singular node)@low
 
   fix:
     ✔ re-implement node base for autonode @done(09-06-2021 17:22)
@@ -23,7 +24,8 @@
     ✔ fix broken serialization and deserialization @done(10-06-2021 12:57)
 
   bug:
-    ✔ after focus selected item in view, zoomMin, zoomMax and zoomFactor go out of proportions. @low @done(14-06-2021 10:52) : when clamped m centreOn group else fitInView
+    ✔ after focus selected item in view, zoomMin, zoomMax and zoomFactor go out of proportions. @low @done(14-06-2021 10:52) : when clamped centreOn group else fitInView
+    ✔ high cpu usage @high @done(15-06-2021 18:37) set deviceCoordinatedCache mode for graphicsitems
 
 
 09-05-2021:

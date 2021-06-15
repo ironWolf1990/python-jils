@@ -1,3 +1,4 @@
+from jigls.jeditor.popup.nodesearch import JSearchBox
 from jigls.jeditor.popup.filedialog import JFileDialog
 from jigls.jeditor.core.graphicview import JGraphicView
 import logging
@@ -5,7 +6,7 @@ from functools import partial
 from typing import Callable, Optional
 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QAction, QDialog
+from PyQt5.QtWidgets import QAction, QDialog, QMenuBar, QWidget
 
 from jigls.jeditor.core.editorwidget import JEditorWidget
 from jigls.jeditor.core.scenemanager import JSceneManager
@@ -18,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def CreateAction(
-    menuBar: QtWidgets.QMenuBar,
+    menuBar: QMenuBar,
     name: str,
     shortcut: Optional[str] = None,
     tooltip: Optional[str] = None,
@@ -35,7 +36,7 @@ def CreateAction(
     return action
 
 
-class JMenuBar(QtWidgets.QMenuBar):
+class JMenuBar(QMenuBar):
     def __init__(self, editorWidget: JEditorWidget):
         super().__init__(parent=None)
         self._editorWidget = editorWidget
@@ -66,7 +67,7 @@ class JMenuBar(QtWidgets.QMenuBar):
                 "&Open",
                 "Ctrl+O",
                 "open graph model",
-                partial(Open, self._editorWidget.sceneManager),
+                partial(Open, self._editorWidget.graphicView),
             )
         )
         fileMenu.addSeparator()
@@ -76,7 +77,7 @@ class JMenuBar(QtWidgets.QMenuBar):
                 "&Save",
                 "Ctrl+S",
                 "save the graph model",
-                partial(Save, self._editorWidget.sceneManager),
+                partial(Save, self._editorWidget.graphicView),
             )
         )
         fileMenu.addAction(
@@ -85,7 +86,7 @@ class JMenuBar(QtWidgets.QMenuBar):
                 "Save &As",
                 "Ctrl+Shift+S",
                 "save graph model as",
-                partial(SaveAs, self._editorWidget.sceneManager),
+                partial(SaveAs, self._editorWidget.graphicView),
             )
         )
         fileMenu.addSeparator()
@@ -233,7 +234,7 @@ class JMenuBar(QtWidgets.QMenuBar):
                 "&Find",
                 "Ctrl+F",
                 "create new graph model",
-                partial(Find, self._editorWidget.sceneManager),
+                partial(Find, self._editorWidget.graphicView, self._editorWidget),
             )
         )
         editMenu.addSeparator()
@@ -306,20 +307,22 @@ def New(sceneManager: JSceneManager):
     logger.debug("new")
 
 
-def Open(sceneManager: JSceneManager):
+def Open(graphicsView: JGraphicView):
     logger.debug("open")
-    JFileDialog.GetOpenFileName(QDialog())
-    # sceneManager.LoadFromFile()
+    filename = JFileDialog.GetOpenFileName(QDialog())
+    if filename:
+        graphicsView.OpenFile(filename)
 
 
 def Close(sceneManager: JSceneManager):
     logger.debug("close")
 
 
-def Save(sceneManager: JSceneManager):
+def Save(graphicsView: JGraphicView):
     logger.debug("save")
-    JFileDialog.GetSaveFileName(QDialog())
-    # sceneManager.SaveToFile()
+    filename = JFileDialog.GetSaveFileName(QDialog())
+    if filename:
+        graphicsView.SaveFile(filename)
 
 
 def SaveAs(sceneManager: JSceneManager):
@@ -368,8 +371,24 @@ def Paste(graphicsView: JGraphicView):
     graphicsView.PasteGraphicsItems()
 
 
-def Find(sceneManager: JSceneManager):
+def _Find(a0: str):
+    print(a0)
+
+
+def Find(graphicsView: JGraphicView, editorWidget: QWidget):
     logger.debug("find")
+
+    def _Find(a0: str):
+        print(a0)
+
+    data = graphicsView.sceneManager.dataStreamer.Serialize()
+    searchBox = JSearchBox(editorWidget, columns=["Name", "UID", "Type"])
+
+    for idx, grNode in enumerate(data.nodes):
+        searchBox.AddItems(idx, grNode.node.name, grNode.node.uid)
+
+    searchBox.nodeUID.connect(graphicsView.FocusSelection)  # type:ignore
+    searchBox.show()
 
 
 def Welcome(sceneManager: JSceneManager):

@@ -1,16 +1,17 @@
 from typing import Optional
-from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QDialog,
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QToolButton,
     QTreeWidget,
     QTreeWidgetItem,
     QVBoxLayout,
     QWidget,
 )
+from PyQt5.QtCore import Qt
 
 
 class Section(QTreeWidgetItem):
@@ -42,19 +43,19 @@ class DelegateSectionOperations(QWidget):
         lable = QLabel()
         lable.setText(title)
 
-        buttonAdd = QtWidgets.QToolButton()
+        buttonAdd = QToolButton()
         buttonAdd.setIcon(QIcon.fromTheme("document-new"))
         buttonAdd.setCheckable(True)
         buttonAdd.setChecked(False)
         buttonAdd.setStyleSheet("QToolButton { border: none; }")
-        buttonAdd.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
+        buttonAdd.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
 
-        buttonRemove = QtWidgets.QToolButton()
+        buttonRemove = QToolButton()
         buttonRemove.setIcon(QIcon.fromTheme("edit-delete"))
         buttonRemove.setCheckable(True)
         buttonRemove.setChecked(False)
         buttonRemove.setStyleSheet("QToolButton { border: none; }")
-        buttonRemove.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
+        buttonRemove.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
 
         self.setLayout(QHBoxLayout())
         self.layout().setSpacing(0)
@@ -69,9 +70,9 @@ class DelegateSectionOperations(QWidget):
         item = QTreeWidgetItem()
 
         item.setFlags(
-            QtCore.Qt.ItemIsEnabled  # type:ignore
-            | QtCore.Qt.ItemIsEditable  # type:ignore
-            | QtCore.Qt.ItemIsSelectable  # type:ignore
+            Qt.ItemIsEnabled  # type:ignore
+            | Qt.ItemIsEditable  # type:ignore
+            | Qt.ItemIsSelectable  # type:ignore
         )
         self.sectionTree.addChild(item)
         self.sectionTree.rootTree.setItemWidget(item, 0, QLineEdit("a"))
@@ -97,7 +98,7 @@ class ExDockWidget1(QDialog):
     def __init__(self, parent: Optional[Optional[QWidget]] = None) -> None:
         super().__init__(parent=parent)
 
-        self.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
+        self.setWindowFlag(Qt.WindowStaysOnTopHint)
         # self.setContentsMargins(0, 0, 0, 0)
         self.setLayout(QVBoxLayout())
         self.properties = PropertiesTree(self)
@@ -114,7 +115,7 @@ class ExDockWidget2(QWidget):
     def __init__(self, parent: Optional[Optional[QWidget]] = None) -> None:
         super().__init__(parent=parent)
 
-        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+        self.setWindowFlag(Qt.FramelessWindowHint)
         self.setContentsMargins(0, 0, 0, 0)
         self.setLayout(QVBoxLayout())
         self.properties = PropertiesTree()
