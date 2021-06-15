@@ -91,3 +91,4 @@ setup.py
 resources/nodez
 jigls/widgets/qac
 jigls/jcore/ccore
+samples/listsearch.py

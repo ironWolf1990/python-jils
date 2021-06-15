@@ -236,15 +236,6 @@ class JMenuBar(QtWidgets.QMenuBar):
                 partial(Find, self._editorWidget.sceneManager),
             )
         )
-        editMenu.addAction(
-            CreateAction(
-                self,
-                "&Search",
-                None,
-                "create new graph model",
-                partial(Search, self._editorWidget.sceneManager),
-            )
-        )
         editMenu.addSeparator()
         editMenu.addAction(
             CreateAction(
@@ -379,10 +370,6 @@ def Paste(graphicsView: JGraphicView):
 
 def Find(sceneManager: JSceneManager):
     logger.debug("find")
-
-
-def Search(sceneManager: JSceneManager):
-    logger.debug("search")
 
 
 def Welcome(sceneManager: JSceneManager):

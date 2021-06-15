@@ -26,11 +26,7 @@ class JGraphicsNode(QGraphicsItem):
 
     __NODE__: str = "BaseNode"
 
-    def __init__(
-        self,
-        baseNode: JBaseNode,
-        parent: Optional[QGraphicsItem] = None,
-    ) -> None:
+    def __init__(self, baseNode: JBaseNode, parent: Optional[QGraphicsItem] = None) -> None:
 
         super().__init__(parent=parent)
 
