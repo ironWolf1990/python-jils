@@ -68,7 +68,7 @@ class JGraphicsSocket(QGraphicsItem):
         return self.baseSocket.__repr__()
 
     def initUI(self):
-        self.setZValue(1)
+        self.setZValue(2)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setAcceptHoverEvents(True)
 

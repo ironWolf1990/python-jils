@@ -1,4 +1,12 @@
 
+15-06-2021:
+
+  fix:
+    ✔ set z-levels for graphics items @done(15-06-2021 23:19)
+
+  bug:
+    ✔ Enabling cachemode breaks edge. does not update when being moved @done(15-06-2021 23:19)
+
 25-05-2021:
   tasks:
     ✔ implement compute operations @done(05-06-2021 14:05)

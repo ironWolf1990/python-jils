@@ -43,13 +43,12 @@ class JGraphicsEdge(QGraphicsPathItem):
 
     def initUI(self):
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
-        self.setZValue(-1.0)
+        self.setZValue(0)
 
-        # ! high cpu usage bug fix sollution
-        self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
+        # ! setting any chachemode breaks edge. not updated when moved
+        # self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
 
-        # pens for diff mode
-
+        # ? pens for diff mode
         self._edgePen = QPen(QColor(JCONSTANTS.GREDGE.COLOR_DEFAULT))
         self._edgePen.setWidthF(JCONSTANTS.GREDGE.WIDTH)
 

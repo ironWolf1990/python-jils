@@ -81,7 +81,7 @@ class JGraphicsNode(QGraphicsItem):
         return self.baseNode.AddOutputSocket(name, multiConnection=multiConnection)
 
     def initUI(self):
-        self.setZValue(1000)
+        self.setZValue(1)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsFocusable, True)
