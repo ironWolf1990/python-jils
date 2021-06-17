@@ -1,10 +1,9 @@
 from __future__ import annotations
 from jigls.jeditor.jdantic import JSocketModel
 
-import typing
 from jigls.jcore.ibase import INode, ISocket
 import logging
-from typing import List, Optional, Union
+from typing import Optional
 from jigls.logger import logger
 
 logger = logging.getLogger(__name__)

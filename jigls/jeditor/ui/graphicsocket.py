@@ -1,10 +1,8 @@
 from __future__ import annotations
-from jigls.jcore.ibase import ISocket
 import typing
 from jigls.jeditor.base.socketbase import JBaseSocket
 import logging
-from typing import List, Optional, Union
-
+from typing import Optional
 from jigls.logger import logger
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import (
@@ -75,8 +73,8 @@ class JGraphicsSocket(QGraphicsItem):
         # ! high cpu usage bug fix sollution
         self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
 
-        self._penOutline = QtGui.QPen(QtGui.QColor(JCONSTANTS.GRSOCKET.COLOR_OUTLINE))
-        self._penOutline.setWidthF(JCONSTANTS.GRSOCKET.WIDTH_OUTLINE)
+        self.penOutline = QtGui.QPen(QtGui.QColor(JCONSTANTS.GRSOCKET.COLOR_OUTLINE))
+        self.penOutline.setWidthF(JCONSTANTS.GRSOCKET.WIDTH_OUTLINE)
 
     def paint(
         self,
@@ -85,7 +83,7 @@ class JGraphicsSocket(QGraphicsItem):
         widget: Optional[QWidget],
     ) -> None:
 
-        painter.setPen(self._penOutline)
+        painter.setPen(self.penOutline)
         painter.setBrush(QtGui.QBrush(QtGui.QColor(JCONSTANTS.GRSOCKET.COLOR_BACKGROUND)))
         if self.multiConnection():
             painter.drawRect(
@@ -114,11 +112,11 @@ class JGraphicsSocket(QGraphicsItem):
         return super().mousePressEvent(event)
 
     def hoverEnterEvent(self, event):
-        self._penOutline.setColor(QtGui.QColor(JCONSTANTS.GRSOCKET.COLOR_HOVER))
+        self.penOutline.setColor(QtGui.QColor(JCONSTANTS.GRSOCKET.COLOR_HOVER))
         super().hoverEnterEvent(event)
 
     def hoverLeaveEvent(self, event):
-        self._penOutline.setColor(QtGui.QColor(JCONSTANTS.GRSOCKET.COLOR_OUTLINE))
+        self.penOutline.setColor(QtGui.QColor(JCONSTANTS.GRSOCKET.COLOR_OUTLINE))
         super().hoverLeaveEvent(event)
 
     @staticmethod

@@ -1,6 +1,9 @@
 
 15-06-2021:
 
+  feature:
+    ✔ add profiler @done(17-06-2021 11:39)
+
   fix:
     ✔ set z-levels for graphics items @done(15-06-2021 23:19)
 
@@ -76,7 +79,7 @@
 
   bug:
     ✔ double check newly added edges if the sockets are updated properly @done(21-05-03 19:55)
-    ☐ qt cursortype not changing based on different modes / actions being performed @low
+    ✔ qt cursortype not changing based on different modes / actions being performed @low @done(17-06-2021 11:40)
     ✔ try to avoid circular dependancy sockets and edges @high @done(21-05-09 00:17)
   
   feature:
