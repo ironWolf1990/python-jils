@@ -4,6 +4,7 @@ from jigls.jeditor.jdantic import JSocketModel
 from jigls.jcore.ibase import INode, ISocket
 import logging
 from typing import Optional
+
 from jigls.logger import logger
 
 logger = logging.getLogger(__name__)
@@ -54,7 +55,9 @@ class JBaseSocket(ISocket):
         execOnConnect: bool
         monitorOnChange: bool
         traceback: bool
+        dirty: bool
         """
+
         return JSocketModel(
             name=self.name,
             uid=self.uid,
@@ -66,8 +69,17 @@ class JBaseSocket(ISocket):
             execOnConnect=self.execOnConnect,
             monitorOnChange=self.monitorOnChange,
             traceback=self.traceback,
+            dirty=self.dirty,
         )
 
     @classmethod
-    def Deserialize(cls, pNode: INode, name: str, uid: str, type: int, multiConnect: bool):
-        return JBaseSocket(pNode=pNode, name=name, uid=uid, type=type, multiConnect=multiConnect)
+    def Deserialize(cls, pNode: INode, socket: JSocketModel):
+        baseSocket = cls(
+            pNode=pNode, name=socket.name, uid=socket.uid, type=socket.type, multiConnect=socket.multiConnect
+        )
+        baseSocket.exec = socket.exec
+        baseSocket.execOnChange = socket.execOnChange
+        baseSocket.execOnConnect = socket.execOnConnect
+        baseSocket.monitorOnChange = socket.monitorOnChange
+        baseSocket.traceback = socket.traceback
+        return baseSocket

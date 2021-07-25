@@ -36,3 +36,33 @@ QFrame {
     background-color: #0A052C;
 }
 """
+
+STYLE_TREE = """
+QTreeView {
+    color: #000000;
+    background-color: #B6B6B6;
+    alternate-background-color: #FFFFFF;
+    selection-color: #FF0000;
+    selection-background-color: #7FB3E6;
+}
+"""
+
+STYLE_NODECONTEXTTABSEARCH = """
+QLineEdit {
+    border: 2px solid rgba(170, 140, 0, 255);
+    border-radius: 0px;
+    padding: 2px;
+    margin: 4px;
+    color: rgba(255, 255, 255, 150);
+    background: rgba(20, 20, 20, 255);
+    selection-background-color: rgba(219, 158, 0, 255);
+}
+"""
+
+STYLE_NODECONTEXTMENU = """
+QMenu {
+    color: rgba(255, 255, 255, 200);
+    background-color: rgba(47, 47, 47, 255);
+    border: 1px solid rgba(0, 0, 0, 30);
+}
+"""

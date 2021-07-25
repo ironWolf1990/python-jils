@@ -28,6 +28,7 @@ class JSocketModel(JBaseModel):
     execOnConnect: bool
     monitorOnChange: bool
     traceback: bool
+    dirty: bool = True
 
 
 class JNodeModel(JBaseModel):
@@ -37,9 +38,12 @@ class JNodeModel(JBaseModel):
 
 
 class JGrNodeModel(JBaseModel):
-    node: JNodeModel
+    # node: JNodeModel
+    nodeType: str
     posX: float
     posY: float
+    node: JNodeModel
+    dataContent: Dict
 
 
 class JGrEdgeModel(JBaseModel):

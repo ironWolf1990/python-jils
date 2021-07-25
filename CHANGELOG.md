@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.8.1] - 2021-07-25
+
+### Added
+
+- imlpement content node
+- implement property widget
+- context menu to create node
+
+### Changed
+
+- merge nodefactory and modestreamer functionality
 
 ## [0.7.5] - 2021-06-15
 

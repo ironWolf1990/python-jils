@@ -8,7 +8,7 @@ class JCONSTANTS:
         TITLE: str = "J-Editor"
         SPLASH: bool = False
         SPLASH_IMAGE: str = r"resources/splash.png"
-        SPLASH_TIME: int = 1300
+        SPLASH_TIME: int = 2000
         START_CENTER_ON_MOUSE: bool = False
 
     class MODEL:
@@ -53,9 +53,9 @@ class JCONSTANTS:
         NODE_WIDHT: int = 240
         NODE_HEIGHT: int = 180
         NODE_PADDING: int = 9
-        COLOR_DEFAULT: str = "#000000"
-        COLOR_SELECTED: str = "#00ff00"
-        COLOR_TITLE: str = "#99cc00"
+        COLOR_OUTLINE_DEFAULT: str = "#000000"
+        COLOR_OUTLINE_SELECTED: str = "#00ff00"
+        COLOR_TITLE_DEFAULT: str = "#99cc00"
         COLOR_BACKGROUND: str = "#E3232323"
 
     class SOCKET:

@@ -43,6 +43,7 @@ class JClipboard(QObject):
         for grNode in self._clipboardData.nodes:
 
             # * assign new node id
+            assert grNode is not None
             grNode.node.uid = UniqueIdentifier()
 
             # * calculate centre position to paste
@@ -68,11 +69,12 @@ class JClipboard(QObject):
         offsetY = mousePosition.y() - (minY + maxY) / 2
 
         for grNode in self._clipboardData.nodes:
+            assert grNode is not None
             grNode.posX += offsetX
             grNode.posX += offsetY
 
         for edge in self._clipboardData.edges:
-
+            assert edge is not None
             # * new edge id
             edge.uid = UniqueIdentifier()
 

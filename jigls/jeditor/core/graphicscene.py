@@ -13,7 +13,7 @@ class JGraphicScene(QGraphicsScene):
     ) -> None:
         super().__init__(parent)
 
-        self._InitVariables()
+        self.initUI()
 
         self._penMajorLine.setWidth(self._widhtMajorLine)
         self._penMinorLine.setWidth(self._widhtMinorLine)
@@ -29,7 +29,7 @@ class JGraphicScene(QGraphicsScene):
     def SetWidthHeight(self, width, height):
         self.setSceneRect(-width // 2, -height // 2, width, height)
 
-    def _InitVariables(self):
+    def initUI(self):
 
         self._colorBackground = QColor(JCONSTANTS.GRSCENE.BACKGROUND_COLOR)
         self._colorMajorLine = QColor(JCONSTANTS.GRSCENE.MAJOR_LINE_COLOR)

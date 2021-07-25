@@ -89,7 +89,8 @@ setup.py
 .setup.py
 .mypy_cache
 resources/nodez
-jigls/widgets/qac
 jigls/jcore/ccore
-samples/listsearch.py
-docs/prioritization.png
+samples
+jbinding/amica
+!models/.gitkeep
+**/*.jigls

@@ -7,6 +7,7 @@ import logging
 from typing import Dict, List, Optional, OrderedDict, Set
 
 from jigls.jeditor.utils import UniqueIdentifier
+
 from jigls.logger import logger
 
 logger = logging.getLogger(__name__)
@@ -65,17 +66,9 @@ class JBaseNode(INode):
     @classmethod
     def Deserialize(cls, nodeModel: JNodeModel) -> JBaseNode:
 
-        baseNode = JBaseNode(name=nodeModel.name, uid=nodeModel.uid)
+        baseNode = cls(name=nodeModel.name, uid=nodeModel.uid)
 
         for socket in nodeModel.socketList:
-            baseNode.AddSocket(
-                JBaseSocket.Deserialize(
-                    pNode=baseNode,
-                    name=socket.name,
-                    uid=socket.uid,
-                    type=socket.type,
-                    multiConnect=socket.multiConnect,
-                )
-            )
+            baseNode.AddSocket(JBaseSocket.Deserialize(pNode=baseNode, socket=socket))
 
         return baseNode

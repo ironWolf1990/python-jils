@@ -1,6 +1,6 @@
 import unittest
 
-from jigls.packages.logic import And, HalfAdder, Not, Xor
+from jigls.package.logic import And, HalfAdder, Not, Xor
 
 # https://openbookproject.net/courses/python4fun/logic.html
 

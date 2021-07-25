@@ -13,10 +13,34 @@ from PyQt5 import QtCore
 logger = logging.getLogger(__name__)
 
 
-class JDataStreamer(QtCore.QDataStream):
+class JModelStreamer(QtCore.QDataStream):
     def __init__(self, graphicsScene: JGraphicScene) -> None:
         super().__init__()
+        self._nodeRegistry: Dict[str, object] = {}
         self._graphicsScene = graphicsScene
+
+    @property
+    def nodeRegistry(self) -> Dict[str, object]:
+        return self._nodeRegistry
+
+    @property
+    def registeredNodeNames(self) -> List[str]:
+        return list(self._nodeRegistry.keys())
+
+    def GetNodeObject(self, nodeTypeName: str) -> object:
+        if nodeTypeName in self._nodeRegistry:
+            return self._nodeRegistry[nodeTypeName]
+        logger.critical(f"node of type {nodeTypeName} is not registered")
+
+    def RegisterNode(self, name: str, node: object):
+        if name is self._nodeRegistry:
+            logger.warning("node with name already registered")
+            return
+        self._nodeRegistry[name] = node
+
+    def RegisterNodes(self, nodeDict: Dict[str, object]):
+        for k, v in nodeDict.items():
+            self.RegisterNode(k, v)
 
     def Serialize(self, selected: bool = False) -> JModel:
 
@@ -57,9 +81,15 @@ class JDataStreamer(QtCore.QDataStream):
 
         for node in data.nodes:
             assert node
-            yield JGraphicsNode.Deserialize(node)
+            nodeObj = self.GetNodeObject(node.nodeType)
+            if nodeObj:
+                yield nodeObj.Deserialize(node)  # type:ignore
+            else:
+                logger.error(f"node type {node.nodeType} not found node registry")
+                return None
 
         for edge in data.edges:
+            assert edge is not None
 
             startSocket: Optional[JGraphicsSocket] = None
             destnSocket: Optional[JGraphicsSocket] = None
@@ -87,6 +117,7 @@ class JDataStreamer(QtCore.QDataStream):
                 uid=edge.uid, startSocket=startSocket, destnSocket=destnSocket, pathType=edge.pathType
             )
             if instanceEdge is None:
-                logger.warning(f"unable to deserialize edge {edge.uid}")
+                logger.error(f"unable to deserialize edge {edge.uid}")
                 continue
+
             yield instanceEdge

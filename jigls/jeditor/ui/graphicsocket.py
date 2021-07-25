@@ -1,27 +1,30 @@
 from __future__ import annotations
-import typing
-from jigls.jeditor.base.socketbase import JBaseSocket
+
 import logging
+import typing
 from typing import Optional
+
+from jigls.jeditor.base.socketbase import JBaseSocket
+from jigls.jeditor.constants import JCONSTANTS
+
 from jigls.logger import logger
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import (
-    QGraphicsItem,
-    QGraphicsSceneMouseEvent,
-    QStyleOptionGraphicsItem,
-    QWidget,
-)
-
-from jigls.jeditor.constants import JCONSTANTS
+from PyQt5.QtCore import QPointF, QRect, QRectF, Qt
+from PyQt5.QtGui import QBrush, QColor, QFont, QPainter, QPainterPath, QPen
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsSceneMouseEvent, QStyleOptionGraphicsItem, QWidget
 
 logger = logging.getLogger(__name__)
 
 
 class JGraphicsSocket(QGraphicsItem):
-    def __init__(self, parent: QGraphicsItem, baseSocket: JBaseSocket, pos: QtCore.QPointF) -> None:
+    def __init__(self, parent: QGraphicsItem, baseSocket: JBaseSocket, pos: QPointF) -> None:
         super().__init__(parent=parent)
 
         self._baseSocket: JBaseSocket = baseSocket
+
+        self._boundingBox: Optional[QRectF] = None
+        self._outline: Optional[QRectF] = None
+
         self.initUI()
         self.setPos(pos)
 
@@ -73,54 +76,58 @@ class JGraphicsSocket(QGraphicsItem):
         # ! high cpu usage bug fix sollution
         self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
 
-        self.penOutline = QtGui.QPen(QtGui.QColor(JCONSTANTS.GRSOCKET.COLOR_OUTLINE))
+        self.penOutline = QPen(QColor(JCONSTANTS.GRSOCKET.COLOR_OUTLINE))
         self.penOutline.setWidthF(JCONSTANTS.GRSOCKET.WIDTH_OUTLINE)
+
+    def boundingRect(self) -> QRectF:
+        if self._boundingBox == None:
+            self._boundingBox = QRectF(
+                int(-JCONSTANTS.GRSOCKET.RADIUS),
+                int(-JCONSTANTS.GRSOCKET.RADIUS),
+                int(2 * JCONSTANTS.GRSOCKET.RADIUS),
+                int(2 * JCONSTANTS.GRSOCKET.RADIUS),
+            )
+            return self._boundingBox
+        return self._boundingBox
+
+    def OutlinePath(self):
+        if self._outline is None:
+            self._outline = QRectF(
+                int(-JCONSTANTS.GRSOCKET.RADIUS),
+                int(-JCONSTANTS.GRSOCKET.RADIUS),
+                int(2 * JCONSTANTS.GRSOCKET.RADIUS),
+                int(2 * JCONSTANTS.GRSOCKET.RADIUS),
+            )
+            return self._outline
+        return self._outline
 
     def paint(
         self,
-        painter: QtGui.QPainter,
+        painter: QPainter,
         option: QStyleOptionGraphicsItem,
         widget: Optional[QWidget],
     ) -> None:
 
         painter.setPen(self.penOutline)
-        painter.setBrush(QtGui.QBrush(QtGui.QColor(JCONSTANTS.GRSOCKET.COLOR_BACKGROUND)))
+        painter.setBrush(QBrush(QColor(JCONSTANTS.GRSOCKET.COLOR_BACKGROUND)))
         if self.multiConnection():
-            painter.drawRect(
-                int(-JCONSTANTS.GRSOCKET.RADIUS),
-                int(-JCONSTANTS.GRSOCKET.RADIUS),
-                int(2 * JCONSTANTS.GRSOCKET.RADIUS),
-                int(2 * JCONSTANTS.GRSOCKET.RADIUS),
-            )
+            painter.drawRect(self.OutlinePath())
         else:
-            painter.drawEllipse(
-                int(-JCONSTANTS.GRSOCKET.RADIUS),
-                int(-JCONSTANTS.GRSOCKET.RADIUS),
-                int(2 * JCONSTANTS.GRSOCKET.RADIUS),
-                int(2 * JCONSTANTS.GRSOCKET.RADIUS),
-            )
-
-    def boundingRect(self) -> QtCore.QRectF:
-        return QtCore.QRectF(
-            int(-JCONSTANTS.GRSOCKET.RADIUS),
-            int(-JCONSTANTS.GRSOCKET.RADIUS),
-            int(2 * JCONSTANTS.GRSOCKET.RADIUS),
-            int(2 * JCONSTANTS.GRSOCKET.RADIUS),
-        )
+            painter.drawEllipse(self.OutlinePath())
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent) -> None:
         return super().mousePressEvent(event)
 
     def hoverEnterEvent(self, event):
-        self.penOutline.setColor(QtGui.QColor(JCONSTANTS.GRSOCKET.COLOR_HOVER))
+        self.penOutline.setColor(QColor(JCONSTANTS.GRSOCKET.COLOR_HOVER))
         super().hoverEnterEvent(event)
 
     def hoverLeaveEvent(self, event):
-        self.penOutline.setColor(QtGui.QColor(JCONSTANTS.GRSOCKET.COLOR_OUTLINE))
+        self.penOutline.setColor(QColor(JCONSTANTS.GRSOCKET.COLOR_OUTLINE))
         super().hoverLeaveEvent(event)
 
     @staticmethod
-    def CalculateSocketPos(index: int, position: int) -> QtCore.QPointF:
+    def CalculateSocketPos(index: int, position: int) -> QPointF:
         # * left posiition
         x = 0
 
@@ -144,4 +151,4 @@ class JGraphicsSocket(QGraphicsItem):
         ]:
             y = JCONSTANTS.GRNODE.NODE_HEIGHT - vertPadding - index * JCONSTANTS.GRSOCKET.SPACING
 
-        return QtCore.QPointF(x, y)
+        return QPointF(x, y)

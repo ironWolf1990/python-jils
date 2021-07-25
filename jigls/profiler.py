@@ -4,15 +4,20 @@ from typing import Callable
 
 
 class Profile:
-    def __init__(self) -> None:
+    def __init__(self, sortBy: str = "ncalls") -> None:
+        """
+        Args:
+            sortBy (str, optional): [ncalls | time | cumulative]. Defaults to "ncalls".
+        """
         self.profiler = cProfile.Profile()
+        self.sortBy = sortBy
 
     def __call__(self, toProfle: Callable):
         self.profiler.enable()
         toProfle()
         self.profiler.disable()
         print(f"\n    {40*'='}\n         PROFILER\n    {40*'='}\n")
-        pstats.Stats(self.profiler).sort_stats("ncalls").print_stats()
+        pstats.Stats(self.profiler).sort_stats(self.sortBy).print_stats()
 
 
 # def ProfileDecorator(toProfile):

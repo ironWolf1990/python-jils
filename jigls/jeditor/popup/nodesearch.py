@@ -1,5 +1,4 @@
 from typing import List
-from PyQt5 import QtCore
 from PyQt5.QtWidgets import (
     QComboBox,
     QDialog,
@@ -10,37 +9,14 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from PyQt5.QtCore import QModelIndex, Qt, QSortFilterProxyModel
+from PyQt5.QtCore import QModelIndex, Qt, QSortFilterProxyModel, pyqtSignal
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from typing import Optional
-
-name = (
-    "Apple",
-    "Facebook",
-    "Google",
-    "Amazon",
-    "Walmart",
-    "Dropbox",
-    "Starbucks",
-    "eBay",
-    "Canon",
-    "Apple",
-    "Facebook",
-    "Google",
-    "Amazon",
-    "Walmart",
-    "Dropbox",
-    "Starbucks",
-    "eBay",
-    "Canon",
-)
-
-uid: List[str] = ["a", "b", "c", "s", "v", "y", "z", "t", "p", "a", "b", "c", "s", "v", "y", "z", "t", "p"]
 
 
 class JSearchBox(QDialog):
 
-    nodeUID = QtCore.pyqtSignal(str)  # return uid
+    signalNodeUID = pyqtSignal(str)  # return uid
 
     def __init__(self, parent: Optional[QWidget], columns: List[str]):
         super().__init__(parent=parent)
@@ -54,7 +30,6 @@ class JSearchBox(QDialog):
         self.setLayout(QVBoxLayout(self))
 
         self.initUI()
-        # self.initContent()
 
     def initUI(self):
 
@@ -62,18 +37,18 @@ class JSearchBox(QDialog):
 
         self.filterModel = QSortFilterProxyModel(self)
         self.filterModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.filterModel.setFilterKeyColumn(0)
 
         # * search
 
         searchLayout = QHBoxLayout(self)
 
-        self.searchFields = QComboBox(self)
-        self.searchFields.addItems(self.columns)
+        self.searchComboBox = QComboBox(self)
+        self.searchComboBox.addItems(self.columns)
 
         self.searchInput = QLineEdit(self)
-        self.filterModel.setFilterKeyColumn(0)
 
-        searchLayout.addWidget(self.searchFields)
+        searchLayout.addWidget(self.searchComboBox)
         searchLayout.addWidget(self.searchInput)
         self.layout().addLayout(searchLayout)
 
@@ -95,10 +70,10 @@ class JSearchBox(QDialog):
         # * trigger
 
         self.searchInput.textChanged.connect(self.filterModel.setFilterRegExp)
-        self.searchFields.currentTextChanged.connect(self.__FieldChange)
-        self.table.clicked[QtCore.QModelIndex].connect(self.Search)  # type:ignore
+        self.searchComboBox.currentTextChanged.connect(self._FieldChange)
+        self.table.clicked[QModelIndex].connect(self.Search)  # type:ignore
 
-    def __FieldChange(self, a0: str):
+    def _FieldChange(self, a0: str):
         self.filterModel.setFilterKeyColumn(self.columns.index(a0))
 
     def AddItems(self, row: int, name: str, uid: str, type: str = "BaseType"):
@@ -115,28 +90,18 @@ class JSearchBox(QDialog):
         self.filterModel.sourceModel().setItem(row, 1, uidItem)
         self.filterModel.sourceModel().setItem(row, 2, typeItem)
 
-    def initContent(self):
-        for idx in range(len(name)):
-            self.AddItems(idx, name[idx], uid[idx])
-
     def Search(self, index: QModelIndex):
 
         sib1 = index.siblingAtRow(index.row()).siblingAtColumn(0)
         sib2 = index.siblingAtRow(index.row()).siblingAtColumn(1)
         sib3 = index.siblingAtRow(index.row()).siblingAtColumn(2)
 
-        self.nodeUID.emit(  # type:ignore
+        self.signalNodeUID.emit(  # type:ignore
             self.filterModel.itemData(sib2)[0],
         )
 
         # print(
         #     self.filterModel.itemData(sib1)[0],
-        #     self.filterModel.itemData(sib2)[0],
-        #     self.filterModel.itemData(sib3)[0],
-        # )
-
-        # print(
-        #     self.filterModel.itemData(sib1),
         #     self.filterModel.itemData(sib2),
-        #     self.filterModel.itemData(sib3),
+        #     self.filterModel.itemData(sib3)[0],
         # )

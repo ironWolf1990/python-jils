@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QAction, QDialog, QMenuBar, QWidget
 
 from jigls.jeditor.core.editorwidget import JEditorWidget
 from jigls.jeditor.core.scenemanager import JSceneManager
+
 from jigls.logger import logger
 from jigls.jeditor.stylesheet import STYLE_QMENUBAR
 
@@ -49,6 +50,7 @@ class JMenuBar(QMenuBar):
         fileMenu = self.addMenu("&File")
         editMenu = self.addMenu("&Edit")
         graphMenu = self.addMenu("&Graph")
+        VariabilityMenu = self.addMenu("&Variability")
         helpMenu = self.addMenu("&Help")
 
         # * file menu
@@ -248,6 +250,16 @@ class JMenuBar(QMenuBar):
             )
         )
 
+        # * graph menu
+        graphMenu.addAction(CreateAction(self, "&Generate Testcases", tooltip=""))
+
+        # * variability menu
+        VariabilityMenu.addAction(CreateAction(self, "&XML Analysis"))
+
+        VariabilityMenu.addAction(CreateAction(self, "&SQL Analysis"))
+
+        VariabilityMenu.addAction(CreateAction(self, "&Coverage (Optimal Testcases)"))
+
         # * help menu
         helpMenu.addAction(
             CreateAction(
@@ -371,23 +383,24 @@ def Paste(graphicsView: JGraphicView):
     graphicsView.PasteGraphicsItems()
 
 
-def _Find(a0: str):
-    print(a0)
-
-
 def Find(graphicsView: JGraphicView, editorWidget: QWidget):
     logger.debug("find")
 
     def _Find(a0: str):
         print(a0)
 
-    data = graphicsView.sceneManager.dataStreamer.Serialize()
+    data = graphicsView.SearchGraphicsNode()
+
+    if not data:
+        return
+
     searchBox = JSearchBox(editorWidget, columns=["Name", "UID", "Type"])
 
     for idx, grNode in enumerate(data.nodes):
-        searchBox.AddItems(idx, grNode.node.name, grNode.node.uid)
+        assert grNode
+        searchBox.AddItems(idx, grNode.node.name, grNode.node.uid, grNode.nodeType)
 
-    searchBox.nodeUID.connect(graphicsView.FocusSelection)  # type:ignore
+    searchBox.signalNodeUID.connect(graphicsView.FocusSelection)  # type:ignore
     searchBox.show()
 
 

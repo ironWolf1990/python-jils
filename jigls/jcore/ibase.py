@@ -24,6 +24,16 @@ class INode(JAbstractBase):
         return self._socketList
 
     @property
+    def exec(self):
+        return self._exec
+
+    @exec.setter
+    def exec(self, value: bool) -> None:
+        self._exec = value
+        for socket in self._socketList:
+            socket.exec = value
+
+    @property
     def operationList(self):
         return self._operationList
 
@@ -93,11 +103,11 @@ class INode(JAbstractBase):
                 socket.Set(v)
             elif socket is None:
                 logger.error(
-                    f"found none socket in function {self.name}:{operation.name}:{operation.fn.__name__}"
+                    f"found none socket in function {self.name}:{operation.name}:{operation.fn.__name__ if operation.fn else 'None'}"
                 )
             else:
                 logger.error(
-                    f"output {k} in function {self.name}:{operation.name}:{operation.fn.__name__} not found in socket list"
+                    f"output {k} in function {self.name}:{operation.name}:{operation.fn.__name__ if operation.fn else 'None'} not found in socket list"
                 )
 
     def _Compute(self):
@@ -256,7 +266,7 @@ class ISocket(JAbstractBase):
     def _Connect(self, cSocket: ISocket):
         # * input can connect to input (used for gouping nodes)
         # * output can connect to input
-        # * output can connect to output (used for data forwarding)
+        # * output can connect to output (used for data forwarding when nodes are grouped)
         if self.Type == JCONSTANTS.SOCKET.TYPE_INPUT and cSocket.Type == JCONSTANTS.SOCKET.TYPE_OUTPUT:
             if self._traceback:
                 logger.warning(
@@ -274,7 +284,7 @@ class ISocket(JAbstractBase):
             return
 
         self._connections.add(cSocket)
-        if self.exec and self._execOnConnect:
+        if self._execOnConnect:
             cSocket.Set(self.data)
 
     def Disconnect(self, dSocket: Union[List[ISocket], ISocket]):
@@ -304,10 +314,6 @@ class ISocket(JAbstractBase):
             self._pNode._Compute()
 
     def Set(self, value):
-        if not self.exec:
-            if self.traceback:
-                logger.debug(f"node:{self._pNode.name} sock:{self._name} is not executable")
-            return
 
         if type(self.dataType()) != type(value):
             self.dirty = True
@@ -327,6 +333,11 @@ class ISocket(JAbstractBase):
             )
 
         self._data = value
+
+        if not self.exec:
+            if self.traceback:
+                logger.debug(f"node:{self._pNode.name} sock:{self._name} is not executable")
+            return
 
         for socket in self._connections:
             # ? this check is needed

@@ -1,3 +1,4 @@
+from jigls.jeditor.jdantic import JModel
 import logging
 import typing
 from typing import List, Optional
@@ -6,16 +7,17 @@ from jigls.jeditor.constants import JCONSTANTS
 from jigls.jeditor.core.scenemanager import JSceneManager
 from jigls.jeditor.ui.graphicnode import JGraphicsNode
 from jigls.jeditor.ui.graphicsocket import JGraphicsSocket
-from jigls.jeditor.widgets.contentwidget import JProxyWidget
-from jigls.jeditor.widgets.dockwidget import ExDockWidget1, ExDockWidget2
+from jigls.jeditor.widgets.dockwidget import DockWidget
+
 from jigls.logger import logger
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QPoint, QPointF, QRect, QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent, QMouseEvent, QTransform, QWheelEvent
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsView, QRubberBand, QWidget
+from PyQt5.QtWidgets import QApplication, QGraphicsItem, QGraphicsView, QMenu, QRubberBand, QWidget
 
 logger = logging.getLogger(__name__)
 import weakref
+from copy import deepcopy
 
 
 class JGraphicView(QGraphicsView):
@@ -34,10 +36,6 @@ class JGraphicView(QGraphicsView):
         self.setScene(sceneManager.graphicsScene)
 
         self.initUI()
-
-        self.o1 = ExDockWidget1()
-        self.o2 = ExDockWidget2()
-        self.tog = False
 
     @property
     def sceneManager(self) -> JSceneManager:
@@ -64,15 +62,18 @@ class JGraphicView(QGraphicsView):
 
         self.setRenderHints(
             QtGui.QPainter.Antialiasing  # type:ignore
-            | QtGui.QPainter.HighQualityAntialiasing
+            # | QtGui.QPainter.HighQualityAntialiasing
             | QtGui.QPainter.TextAntialiasing
             | QtGui.QPainter.SmoothPixmapTransform
         )
 
         # * policy and property
         self.setCacheMode(QGraphicsView.CacheBackground)
+
         # self.setOptimizationFlag(QtWidgets.QGraphicsView.DontAdjustForAntialiasing)
-        self.setViewportUpdateMode(QGraphicsView.MinimalViewportUpdate)
+        # self.setViewportUpdateMode(QGraphicsView.MinimalViewportUpdate)
+
+        self.setViewportUpdateMode(QGraphicsView.SmartViewportUpdate)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy(self.scrollbarHorzPolicy))
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy(self.scrollbarVertPolicy))
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
@@ -118,6 +119,9 @@ class JGraphicView(QGraphicsView):
         # * end edge reroute
         elif event.button() == Qt.LeftButton and self._currentMode == JCONSTANTS.GRVIEW.MODE_EDGE_REROUTE:
             self.EndEdgeReRouting(self.scene().itemAt(self.mapToScene(event.pos()), QTransform()))
+
+        # * save mouse positon if needed to be used by other methods
+        self._mousePosition = self.mapToScene(event.pos())
 
         super().mousePressEvent(event)
 
@@ -172,24 +176,43 @@ class JGraphicView(QGraphicsView):
         super().mouseReleaseEvent(event)
 
     def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
-
-        if (
-            event.button() == Qt.LeftButton
-            and self._currentMode == JCONSTANTS.GRVIEW.MODE_DEFAULT
-            and isinstance(
-                self.scene().itemAt(self.mapToScene(event.pos()), QTransform()),
-                (JGraphicsNode, JProxyWidget),
-            )
-        ):
-            logger.debug("got double click for dock")
-            if self.tog:
-                self.SignalNodeDoubleClick.emit(weakref.ref(self.o1))  # type:ignore
-                self.tog = not self.tog
-            elif not self.tog:
-                self.SignalNodeDoubleClick.emit(weakref.ref(self.o2))  # type:ignore
-                self.tog = not self.tog
+        # ? was old idea, double click to show node property in dock
+        # self.o1 = DockWidget()
+        # self.o2 = DockWidget()
+        # self.tog = False
+        # if (
+        #     event.button() == Qt.LeftButton
+        #     and self._currentMode == JCONSTANTS.GRVIEW.MODE_DEFAULT
+        #     and isinstance(
+        #         self.scene().itemAt(self.mapToScene(event.pos()), QTransform()),
+        #         (JGraphicsNode, JProxyWidget),
+        #     )
+        # ):
+        #     logger.debug("got double click for dock")
+        #     if self.tog:
+        #         self.SignalNodeDoubleClick.emit(weakref.ref(self.o1))  # type:ignore
+        #         self.tog = not self.tog
+        #     elif not self.tog:
+        #         self.SignalNodeDoubleClick.emit(weakref.ref(self.o2))  # type:ignore
+        #         self.tog = not self.tog
 
         return super().mouseDoubleClickEvent(event)
+
+    def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
+        return super().contextMenuEvent(event)
+        # ? was old idea,node context menu triggered by keypress
+        # contextMenu = QMenu(self)
+        # newAct = contextMenu.addAction("New")
+        # newClose = contextMenu.addAction("Close")
+
+        # # if self.underMouse()
+        # action = contextMenu.exec_(self.mapToGlobal(event.pos()))
+        # if action == newClose:
+        #     print(action.text())
+        #     contextMenu.close()
+
+        # self.setCursor(Qt.ArrowCursor)
+        # self.setInteractive(True)
 
     def wheelEvent(self, event: QWheelEvent):
         zoomOutFactor = 1 / self._zoomInFactor
@@ -275,6 +298,16 @@ class JGraphicView(QGraphicsView):
             and self._currentMode == JCONSTANTS.GRVIEW.MODE_DEFAULT
         ):
             self.FocusSelection()
+
+        # * node create menu
+        elif (
+            # event.key() == Qt.Key_N
+            # and event.modifiers() == Qt.ShiftModifier
+            event.key() == Qt.Key_Tab
+            and event.modifiers() == Qt.NoModifier
+            and self._currentMode == JCONSTANTS.GRVIEW.MODE_DEFAULT
+        ):
+            self.GraphicsNodeContextMenu()
 
         super().keyPressEvent(event)
 
@@ -364,3 +397,24 @@ class JGraphicView(QGraphicsView):
             return
 
         self._sceneManager.OpenFile(filename=filename)
+
+    def GraphicsNodeContextMenu(self):
+
+        if self._currentMode != JCONSTANTS.GRVIEW.MODE_DEFAULT:
+            logger.error(f"can only perform paste action in MODE_DEFAULT, current mode {self._currentMode}")
+            return
+
+        if not self.underMouse():
+            logger.debug(f"graphicsview not under mouse")
+            return
+
+        self._sceneManager.GraphicsNodeContextMenu(
+            self.mapToGlobal(self.mapFromScene(self._mousePosition)), self._mousePosition
+        )
+
+    def SearchGraphicsNode(self) -> Optional[JModel]:
+        if self._currentMode != JCONSTANTS.GRVIEW.MODE_DEFAULT:
+            logger.error(f"can only perform paste action in MODE_DEFAULT, current mode {self._currentMode}")
+            return None
+
+        return self._sceneManager.modelStreamer.Serialize()

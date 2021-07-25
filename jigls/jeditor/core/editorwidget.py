@@ -1,4 +1,5 @@
 # from gui.graphicedge import JigleGraphicEdge
+from typing import Dict
 from .scenemanager import JSceneManager
 from .graphicview import JGraphicView
 from PyQt5 import QtWidgets
@@ -39,3 +40,9 @@ class JEditorWidget(QWidget):
     @property
     def sceneManager(self) -> JSceneManager:
         return self._sceneManager
+
+    def RegisterNode(self, name: str, node: object):
+        self._sceneManager.modelStreamer.RegisterNode(name, node)
+
+    def RegisterNodes(self, nodeDict: Dict[str, object]):
+        self._sceneManager.modelStreamer.RegisterNodes(nodeDict)

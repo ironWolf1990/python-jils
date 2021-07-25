@@ -8,6 +8,7 @@ from jigls.jeditor.constants import JCONSTANTS
 from jigls.jeditor.core.graphicedgepath import JGraphicEdgeBezier, JGraphicEdgeDirect, JGraphicEdgeSquare
 from jigls.jeditor.jdantic import JGrEdgeModel
 from jigls.jeditor.utils import UniqueIdentifier
+
 from jigls.logger import logger
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QColor, QPainter, QPen
@@ -45,7 +46,7 @@ class JGraphicsEdge(QGraphicsPathItem):
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setZValue(0)
 
-        # ! setting any chachemode breaks edge. not updated when moved
+        # ! setting any chachemode breaks edge. not updating edge when socket is moved
         # self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
 
         # ? pens for diff mode
@@ -136,10 +137,10 @@ class JGraphicsEdge(QGraphicsPathItem):
         self._startSocket.Disconnect(self._destnSocket.baseSocket)
 
     def ConnectToSockets(self):
-        self.DisconnectFromSockets()
         """to help assist with undostack when re-inserting edge"""
-        self._destnSocket.Connect(self._startSocket.baseSocket)
-        self._startSocket.Connect(self._destnSocket.baseSocket)
+        self.DisconnectFromSockets()
+        self._destnSocket.Connect(self._startSocket.baseSocket)  # type:ignore
+        self._startSocket.Connect(self._destnSocket.baseSocket)  # type:ignore
 
     def UpdatePath(self, *args, **kwargs):
         if self.pathType == JCONSTANTS.GREDGE.PATH_DIRECT:
@@ -160,6 +161,8 @@ class JGraphicsEdge(QGraphicsPathItem):
         )
 
     def Serialize(self):
+        assert self.destnSocket is not None
+        assert self.startSocket is not None
         return JGrEdgeModel(
             uid=self.uid(),
             startSocket=self.startSocket.uid(),

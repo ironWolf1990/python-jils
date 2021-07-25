@@ -1,6 +1,14 @@
 
-15-06-2021:
+20-06-2021:
+  tasks:
+    ✔ imlpement content node @high @done(25-07-2021 19:08)
+    ✔ implement property widget @high @done(25-07-2021 19:08)
+    ✔ context menu to create node @critical @done(25-07-2021 19:08)
 
+  changes:
+    ✔ merge nodefactory and modestreamer functionality @done(25-07-2021 19:08)
+
+15-06-2021:
   feature:
     ✔ add profiler @done(17-06-2021 11:39)
 
@@ -13,9 +21,9 @@
 25-05-2021:
   tasks:
     ✔ implement compute operations @done(05-06-2021 14:05)
-    ☐ imlpement content node
+    imlpement content node 
     ✔ use pydantic for data serialization @started(30-05-2021 15:57) @done(30-05-2021 22:38) @lasted(6h41m31s)
-    ☐ implement property widget
+    implement property widget
     ✔ implement basic file operations @done(15-06-2021 16:51)
     ✔ implement simple dock @done(30-05-2021 22:38)
     ✔ implement zooming into selected nodes in view (focus selected nodes) @done(14-06-2021 01:14)
@@ -58,7 +66,6 @@
     ✔ catching socket max limit during edge deserialization class method. Cause issue when copy pasting items; edges with open ended connections cause issue for non multitype sockets @critical @done(24-05-2021 23:26)
   
   feature:
-    ☐ editor status bar shows mode and last stack operation
     ✔ implement splash screen @done(23-05-2021 23:12)
     ✔ implement pydantic base models @high @started(25-05-2021 15:17) @done(25-05-2021 17:21) @lasted(2h4m29s)
     ✔ editor auto centers on startup @done(24-05-2021 11:33)

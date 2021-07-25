@@ -26,6 +26,8 @@ class JOperation(JAbstractOperation):
 
     def Compute(self, inputDict, outputs=None):
 
+        assert self.fn is not None
+
         inputs = [inputDict[d] for d in self.inputs if not isinstance(d, OptionalArg)]
 
         optionals = {n: inputDict[n] for n in self.inputs if isinstance(n, OptionalArg) and n in inputDict}
@@ -50,10 +52,11 @@ class JOperation(JAbstractOperation):
         return dict(result)
 
     def __call__(self, *args, **kwargs):
+        assert self.fn is not None
         return self.fn(*args, **kwargs)
 
     def __getstate__(self):
-        return super().__getstate__().update({"fn": self.fn.__name__})
+        return super().__getstate__().update({"fn": self.fn.__name__ if self.fn else "None"})
 
     def __repr__(self):
         func_name = self.fn and getattr(self.fn, "__name__", None)

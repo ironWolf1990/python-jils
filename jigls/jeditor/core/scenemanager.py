@@ -1,19 +1,24 @@
+from functools import partial
+from jigls.jeditor.widgets.nodecontextmenu import NodeContextMenu
 import json
 import logging
 import typing
 from typing import Dict, List, Optional, Set, Tuple
 
+from jigls.jeditor.base.nodebase import JBaseNode
 from jigls.jeditor.constants import JCONSTANTS
 from jigls.jeditor.operations.clipboardoperation import JClipboard
-from jigls.jeditor.operations.datastreamer import JDataStreamer
+from jigls.jeditor.operations.datastreamer import JModelStreamer
 from jigls.jeditor.operations.edgeoperation import JEdgeDragging, JEdgeRerouting
 from jigls.jeditor.operations.fileoperation import JFileManager
-from jigls.jeditor.operations.nodefactory import JNodeFactory
+
+# from jigls.jeditor.operations.nodefactory import JNodeFactory
 from jigls.jeditor.ui.graphicedge import JGraphicsEdge
 from jigls.jeditor.ui.graphicnode import JGraphicsNode
 from jigls.jeditor.ui.graphicsocket import JGraphicsSocket
 from jigls.logger import logger
-from PyQt5.QtCore import QObject, QPointF, QRectF
+from jigls.package.node import WebElementNode
+from PyQt5.QtCore import QObject, QPoint, QPointF, QRectF
 from PyQt5.QtWidgets import QGraphicsItem, QUndoStack
 
 from .commands import (
@@ -26,6 +31,7 @@ from .commands import (
 from .graphicscene import JGraphicScene
 
 logger = logging.getLogger(__name__)
+import time
 
 
 class JSceneManager(QObject):
@@ -34,34 +40,44 @@ class JSceneManager(QObject):
 
         self._graphicsScene = JGraphicScene()
 
-        self._nodeFactory = JNodeFactory()
+        # self._nodeFactory = JNodeFactory()
         self._undoStack = QUndoStack(self._graphicsScene)
         self._edgeDragging = JEdgeDragging(self._graphicsScene)
         self._edgeReroute = JEdgeRerouting(self._graphicsScene)
 
-        self._dataStreamer = JDataStreamer(self._graphicsScene)
+        self._modelStreamer = JModelStreamer(self._graphicsScene)
         self._fileManager = JFileManager()
         self._clipboard = JClipboard()
 
         self._currentFile: Optional[str] = None
 
+        self._contextMenu = NodeContextMenu()
+
+        # ? helpers
+        self._mousePosition: QPointF = QPointF()
+        self._contextMenu.signalCreateNode.connect(self._InstantiateNode)  # type:ignore
+
         self._debug()
+
+    def out(self):
+        print("out")
+        pass
 
     @property
     def graphicsScene(self) -> JGraphicScene:
         return self._graphicsScene
 
-    @property
-    def nodeFactory(self) -> JNodeFactory:
-        return self._nodeFactory
+    # @property
+    # def nodeFactory(self) -> JNodeFactory:
+    #     return self._nodeFactory
 
     @property
     def undoStack(self) -> QUndoStack:
         return self._undoStack
 
     @property
-    def dataStreamer(self) -> JDataStreamer:
-        return self._dataStreamer
+    def modelStreamer(self) -> JModelStreamer:
+        return self._modelStreamer
 
     @property
     def fileManager(self) -> JFileManager:
@@ -72,10 +88,9 @@ class JSceneManager(QObject):
         return self._clipboard
 
     def _debug(self):
-        node1 = self._nodeFactory.CreateNode(False, False)
-        node2 = self._nodeFactory.CreateNode(True, True)
-        node3 = self._nodeFactory.CreateNode(True, False)
-        # node4 = JGraphicNode(inSockets=1, outSockets=1, nodeContent=JNodeContent())
+        node1 = WebElementNode(JBaseNode("WebElement Node"))
+        node2 = WebElementNode(JBaseNode("WebElement Node"))
+        node3 = WebElementNode(JBaseNode("WebElement Node"))
 
         node1.setPos(QPointF(-350, -250))
         node2.setPos(QPointF(-75, 0))
@@ -87,13 +102,13 @@ class JSceneManager(QObject):
 
     def SaveFile(self, filename):
         logger.info(f"saving to file")
-        self._fileManager.SaveFile(self._dataStreamer.Serialize(), filename=filename)
+        self._fileManager.SaveFile(self._modelStreamer.Serialize(), filename=filename)
 
     def OpenFile(self, filename):
         logger.info(f"loading from file")
         self._undoStack.clear()
         self._graphicsScene.clear()
-        for gItem in self._dataStreamer.Deserialize(self._fileManager.OpenFile(filename=filename)):
+        for gItem in self._modelStreamer.Deserialize(self._fileManager.OpenFile(filename=filename)):
             if gItem is None:
                 logger.error(f"deserialization error, got 'None' item")
                 continue
@@ -180,7 +195,8 @@ class JSceneManager(QObject):
                 for gSocket in item.graphicsSocketList:
                     for edge in self._graphicsScene.items():
                         if isinstance(edge, JGraphicsEdge) and any(
-                            gSocket.uid() == socket.uid() for socket in (edge.startSocket, edge.destnSocket)
+                            gSocket.uid() == socket.uid()  # type:ignore
+                            for socket in (edge.startSocket, edge.destnSocket)
                         ):
                             edgeIdRemove.add(edge.uid())
 
@@ -265,13 +281,11 @@ class JSceneManager(QObject):
 
     def CopyItems(self):
         logger.info("copying selected item")
-        self._clipboard.Copy(self._dataStreamer.Serialize(selected=True))
+        self._clipboard.Copy(self._modelStreamer.Serialize(selected=True))
 
     def CutItems(self):
-
         logger.info("cutting selected item")
-
-        self._clipboard.Cut(self._dataStreamer.Serialize(selected=True))
+        self._clipboard.Cut(self._modelStreamer.Serialize(selected=True))
         self.RemoveFromScene()
 
     def PasteItems(self, mousePosition: QPointF):
@@ -284,7 +298,7 @@ class JSceneManager(QObject):
             return
 
         self._undoStack.beginMacro("pasting items")
-        for gItem in self._dataStreamer.Deserialize(genPaste):
+        for gItem in self._modelStreamer.Deserialize(genPaste):
             if isinstance(gItem, JGraphicsNode):
                 self._undoStack.beginMacro("pasting node")
                 self._undoStack.push(JNodeAddCommand(self._graphicsScene, gItem))
@@ -302,7 +316,6 @@ class JSceneManager(QObject):
 
         items: List[QGraphicsItem] = []
 
-        # ? focus list got from search
         if focusList:
             logger.debug("focus items")
             # * to get rid of stupid error. dont like red lines in editor
@@ -334,3 +347,21 @@ class JSceneManager(QObject):
         rect = group.boundingRect()
         self._graphicsScene.destroyItemGroup(group)
         return rect
+
+    def GraphicsNodeContextMenu(self, cursorPos: QPoint, scenePos: QPointF):
+        self._mousePosition = scenePos
+        self._contextMenu.setVisible(True)
+        if not self._contextMenu._isPopulated:
+            self._contextMenu._Build(self._modelStreamer.registeredNodeNames)
+        self._contextMenu.move(cursorPos)
+
+    def _InstantiateNode(self, node: str):
+        nodeObj = self._modelStreamer.GetNodeObject(node)
+        if nodeObj:
+            node = nodeObj(JBaseNode(node))  # type:ignore
+            assert isinstance(node, JGraphicsNode)
+            node.setPos(self._mousePosition)
+
+            self._undoStack.beginMacro("instantiating node")
+            self._undoStack.push(JNodeAddCommand(self._graphicsScene, node))
+            self._undoStack.endMacro()

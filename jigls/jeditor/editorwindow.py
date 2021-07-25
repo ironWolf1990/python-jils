@@ -34,6 +34,10 @@ class JEditorWindow(QMainWindow):
         self._editorWidget = JEditorWidget(self)
         self.initUI()
 
+    @property
+    def editorWidget(self) -> JEditorWidget:
+        return self._editorWidget
+
     def toggleDocket(self, a0: weakref):
         self.dockable.setWidget(a0())
 
@@ -55,6 +59,7 @@ class JEditorWindow(QMainWindow):
 
         self.setCentralWidget(self._editorWidget)
 
+        self.setStatusBar(JStatusBar(self))
         self.statusBar().showMessage("this is message")
 
         self.dockable = QDockWidget("Node Property Dock", self)

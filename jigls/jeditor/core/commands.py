@@ -3,6 +3,7 @@ import logging
 from jigls.jeditor.ui.graphicedge import JGraphicsEdge
 from jigls.jeditor.ui.graphicnode import JGraphicsNode
 from jigls.jeditor.ui.graphicsocket import JGraphicsSocket
+
 from jigls.logger import logger
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QGraphicsScene, QUndoCommand

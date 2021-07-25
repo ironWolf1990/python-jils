@@ -73,7 +73,7 @@ class JEdgeDragging(QObject):
 
         if isinstance(destnSocket, JGraphicsSocket):
             # * check same socket
-            if self._startSocket.uid() == destnSocket.uid():
+            if self._startSocket.uid() == destnSocket.uid():  # type:ignore
                 logger.warning(f"tried connecting same socket")
                 flag = False
 
@@ -98,9 +98,9 @@ class JEdgeDragging(QObject):
                         filter(
                             lambda edge: isinstance(edge, JGraphicsEdge)
                             and isinstance(destnSocket, JGraphicsSocket)
-                            and edge.uid() != self._tempEdge.uid()
-                            and edge.startSocket.uid() == self._tempEdge.startSocket.uid()
-                            and edge.destnSocket.uid() == destnSocket.uid(),
+                            and edge.uid() != self._tempEdge.uid()  # type:ignore
+                            and edge.startSocket.uid() == self._tempEdge.startSocket.uid()  # type:ignore
+                            and edge.destnSocket.uid() == destnSocket.uid(),  # type:ignore
                             self._graphicsScene.items(),
                         )
                     )
@@ -189,7 +189,7 @@ class JEdgeRerouting(QObject):
 
         if isinstance(destnSocket, JGraphicsSocket):
             # * check same socket
-            if self._startSocket.uid() == destnSocket.uid():
+            if self._startSocket.uid() == destnSocket.uid():  # type:ignore
                 logger.warning(f"tried connecting to start socket")
                 flag = False
 
@@ -209,7 +209,7 @@ class JEdgeRerouting(QObject):
                 flag = False
 
             # * reconnecting to same destination socket
-            elif self._oDestinationSocket.uid() == destnSocket.uid():
+            elif self._oDestinationSocket.uid() == destnSocket.uid():  # type:ignore
                 logger.warning(f"reconnecting to same destination socket")
                 flag = False
 
@@ -220,9 +220,9 @@ class JEdgeRerouting(QObject):
                         filter(
                             lambda edge: isinstance(edge, JGraphicsEdge)
                             and isinstance(destnSocket, JGraphicsSocket)
-                            and edge.uid() != self._tempEdge.uid()
-                            and edge.startSocket.uid() == self._tempEdge.startSocket.uid()
-                            and edge.destnSocket.uid() == destnSocket.uid(),
+                            and edge.uid() != self._tempEdge.uid()  # type:ignore
+                            and edge.startSocket.uid() == self._tempEdge.startSocket.uid()  # type:ignore
+                            and edge.destnSocket.uid() == destnSocket.uid(),  # type:ignore
                             self._graphicsScene.items(),
                         )
                     )
